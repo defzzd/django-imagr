@@ -6,7 +6,9 @@ from datetime import datetime
 
 #     Photo contains an image and meta-data associated with that image
 #         Photos are owned by Users
-#         Meta-data should include a title and a description.  A date_uploaded, date_modified and date_published field.  You should also have a 'published' field takes one of three values ('private', 'shared', 'public')
+#         Meta-data should include a title and a description.
+#             A date_uploaded, date_modified and date_published field.
+#             You should also have a 'published' field takes one of three values ('private', 'shared', 'public')
 PUBLISHED_CHOICES = (
     ("private", "Private Photo"),
     ("shared",  "Shared Photo"),
@@ -17,8 +19,8 @@ class Photo(models.Model):
     user = models.ForeignKey(ImagrUser)
     title = models.CharField(max_length=20)
     description = models.CharField(max_length=140)
-    date_uploaded = models.DateField()
-    date_modified = models.DateField()
+    date_uploaded = models.DateField(auto_now_add=True)
+    date_modified = models.DateField(auto_now=True)
     date_published = models.DateField()
     published = models.CharField(max_length=7,
                                 choices=PUBLISHED_CHOICES,
@@ -31,7 +33,18 @@ class Photo(models.Model):
 #         Users should be able to designate one contained photo as the 'cover' for the album.
 #         The albums created by a user may contain only Photos created by that same user.
 class Album(models.Model):
-    pass
+    user = models.ForeignKey(ImagrUser)
+    title = models.CharField(max_length=20)
+    description = models.CharField(max_length=140)
+    date_uploaded = models.DateField(auto_now_add=True)
+    date_modified = models.DateField(auto_now=True)
+    date_published = models.DateField()
+    published = models.CharField(max_length=7,
+                                choices=PUBLISHED_CHOICES,
+                                default="private")
+    cover = models.ForeignKey(Photo)
+    photos = models.ManyToManyField(Photo)
+
 
 # After you have that working, you'll also want to create a customized User class:
 
