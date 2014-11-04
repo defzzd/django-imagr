@@ -53,6 +53,8 @@ class Album(models.Model):
 #         Users should be able to see a list of the users the follow and the list of users following them.
 #         Users should have a 'date_joined' field and an 'active' field that allows disabling an account.
 class ImagrUser(AbstractBaseUser):
-
-    pass
+    followers = models.ManyToManyField(ImagrUser)
+    following = modles.ManyToManyField(ImagrUser)
+    our_date_joined_field = models.DateField(auto_now_add=True)
+    our_is_active_field = models.BooleanField()
 
