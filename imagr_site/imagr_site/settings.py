@@ -86,7 +86,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-import models
-AUTH_USER_MODEL = models.ImagrUser
+AUTH_USER_MODEL = 'imagr_app.ImagrUser'
 
 
