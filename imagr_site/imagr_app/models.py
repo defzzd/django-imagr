@@ -12,10 +12,12 @@ from datetime import datetime
 #         Users should be able to see a list of the users the follow and the list of users following them.
 #         Users should have a 'date_joined' field and an 'active' field that allows disabling an account.
 class ImagrUser(AbstractBaseUser):
+    identifier = models.CharField(max_length=40, unique=True, default=None)
     followers = models.ManyToManyField("self", symmetrical=False, related_name="ImagrUser_followers")
     following = models.ManyToManyField("self", symmetrical=False, related_name="ImagrUser_following")
     our_date_joined_field = models.DateField(auto_now_add=True)
     our_is_active_field = models.BooleanField(default=False)
+    USERNAME_FIELD = 'identifier'
 
 #     Photo contains an image and meta-data associated with that image
 #         Photos are owned by Users
