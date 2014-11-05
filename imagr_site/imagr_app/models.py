@@ -4,6 +4,19 @@ from datetime import datetime
 
 # Create your models here.
 
+
+# After you have that working, you'll also want to create a customized User class:
+
+#     ImagrUser should be based off of the standard built-in Django User, with the following enhancements:
+#         Users should be able to follow other users.
+#         Users should be able to see a list of the users the follow and the list of users following them.
+#         Users should have a 'date_joined' field and an 'active' field that allows disabling an account.
+class ImagrUser(AbstractBaseUser):
+    followers = models.ManyToManyField("self")
+    following = models.ManyToManyField("self")
+    our_date_joined_field = models.DateField(auto_now_add=True)
+    our_is_active_field = models.BooleanField(default=False)
+
 #     Photo contains an image and meta-data associated with that image
 #         Photos are owned by Users
 #         Meta-data should include a title and a description.
@@ -42,19 +55,8 @@ class Album(models.Model):
     published = models.CharField(max_length=7,
                                 choices=PUBLISHED_CHOICES,
                                 default="private")
-    cover = models.ForeignKey(Photo)
-    photos = models.ManyToManyField(Photo)
+    cover = models.ForeignKey(Photo, related_name='Album_cover')
+    photos = models.ManyToManyField(Photo, related_name="Album_photos")
 
 
-# After you have that working, you'll also want to create a customized User class:
-
-#     ImagrUser should be based off of the standard built-in Django User, with the following enhancements:
-#         Users should be able to follow other users.
-#         Users should be able to see a list of the users the follow and the list of users following them.
-#         Users should have a 'date_joined' field and an 'active' field that allows disabling an account.
-class ImagrUser(AbstractBaseUser):
-    followers = models.ManyToManyField(ImagrUser)
-    following = modles.ManyToManyField(ImagrUser)
-    our_date_joined_field = models.DateField(auto_now_add=True)
-    our_is_active_field = models.BooleanField()
 
