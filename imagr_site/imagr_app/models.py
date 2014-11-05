@@ -14,8 +14,10 @@ from datetime import datetime
 class ImagrUser(AbstractBaseUser):
     followers = models.ManyToManyField("self")
     following = models.ManyToManyField("self")
+    identifier = models.CharField(max_length=40, unique=True, default=None)
     our_date_joined_field = models.DateField(auto_now_add=True)
     our_is_active_field = models.BooleanField(default=False)
+    USERNAME_FIELD = 'identifier'
 
 #     Photo contains an image and meta-data associated with that image
 #         Photos are owned by Users
