@@ -12,8 +12,8 @@ from datetime import datetime
 #         Users should be able to see a list of the users the follow and the list of users following them.
 #         Users should have a 'date_joined' field and an 'active' field that allows disabling an account.
 class ImagrUser(AbstractBaseUser):
-    followers = models.ManyToManyField("self")
-    following = models.ManyToManyField("self")
+    followers = models.ManyToManyField("self", symmetrical=False)
+    following = models.ManyToManyField("self", symmetrical=False)
     our_date_joined_field = models.DateField(auto_now_add=True)
     our_is_active_field = models.BooleanField(default=False)
 
