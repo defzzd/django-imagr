@@ -40,6 +40,10 @@ class Photo(models.Model):
     published = models.CharField(max_length=7,
                                 choices=PUBLISHED_CHOICES,
                                 default="private")
+    # The name for an AWS S3 url is actually an object key.
+    # These object keys are sequences of Unicode characters
+    # whose UTF-8 encoding is at most 1024 bytes long.
+    image_url = models.CharField(max_length=1024, default="Photo Not Found")
 
 #     Album contains Photos and provide meta-data about the collection of photos they contain.
 #         Albums are owned by Users
