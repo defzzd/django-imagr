@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate, login
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.conf import settings
 
 from django.views import generic
 
@@ -17,7 +18,7 @@ def home_page(request):
 
     if request.user.is_authenticated():
 
-        imagr_user_object = get_object_or_404(models.ImagrUser,
+        imagr_user_object = get_object_or_404(settings.AUTH_USER_MODEL,
                                               pk=request.user.id)
 
         user_id = imagr_user_object.id
