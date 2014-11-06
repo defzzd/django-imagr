@@ -12,6 +12,7 @@
                   at the image, which is stored in S3... if it works that way.
         <li><a href="{% url 'imagr_app:album_page' album.id %}"><img src="{% url 'imagr_app:photo_source' album.cover %}" height="128" width="128"></a></li>
         -->
+        <li><a href="{% url 'imagr_app:album_page' album.id %}"><img src="{{ album.cover.image_url }}" height="128" width="128"></a></li>
         <li><a href="{% url 'imagr_app:album_page' album.id %}">{{ album.title }}</a></li>
     {% endfor %}
     </ul>
