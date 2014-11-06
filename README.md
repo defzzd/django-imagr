@@ -1,5 +1,6 @@
 #django-imagr
 ============
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/CharlesGust/django-imagr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This was produced by Charlie Rode, Ben Friedland, and Charles Gust
 
