@@ -16,7 +16,7 @@ def front_page(request):
 def home_page(request):
 
     if request.user.is_authenticated():
-        # stuff we need
+
         imagr_user_object = get_object_or_404(models.ImagrUser,
                                               pk=request.user.id)
 
@@ -24,8 +24,11 @@ def home_page(request):
         list_of_albums = get_list_or_404(models.Album,
                                          user=user_id)
 
-        # Should be home_page
-        return render(request, 'imagr_app/home_page.html')
+        # list_of_albums=list_of_albums may need to be changed
+        # to however context is handed through render()
+        return render(request,
+                      'imagr_app/home_page.html',
+                      list_of_albums=list_of_albums)
 
     else:
         return HttpResponseRedirect(reverse('imagr_app:front_page'))
@@ -42,8 +45,9 @@ def home_page(request):
 # ++    encourage them to sign up (don't worry that we lack a means for
 # ++    them to sign up yet.  We'll add that soon).
 
-# A "home page" that shows logged-in users a list of their albums, with
-#     a representative image from each album
+# ++ A "home page" that shows logged-in users a list of their albums,
+# --    with a representative image from each album
+
 # An "album page" that shows logged-in users a display of photos in
 #     a single album
 # A "photo page" that shows logged-in users a single photo along with
