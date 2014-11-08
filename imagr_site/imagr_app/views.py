@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.contrib.auth import authenticate, login
+from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.contrib.auth import authenticate, login, get_user_model
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.conf import settings
@@ -18,7 +18,7 @@ def home_page(request):
 
     if request.user.is_authenticated():
 
-        imagr_user_object = get_object_or_404(settings.AUTH_USER_MODEL,
+        imagr_user_object = get_object_or_404(get_user_model(),
                                               pk=request.user.id)
 
         user_id = imagr_user_object.id
@@ -29,7 +29,8 @@ def home_page(request):
         # to however context is handed through render()
         return render(request,
                       'imagr_app/home_page.html',
-                      list_of_albums=list_of_albums)
+                      {'list_of_albums': list_of_albums},
+                      )
 
     else:
         return HttpResponseRedirect(reverse('imagr_app:front_page'))

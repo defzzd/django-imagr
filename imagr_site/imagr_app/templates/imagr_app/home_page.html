@@ -2,18 +2,12 @@
 {% if list_of_albums %}
     <ul>
     {% for album in list_of_albums %}
-        <!-- The following line should create a clickable photo for each
-                  album cover using a URL that points to that album cover
-                  to display the image, and a URL that points to the album
-                  page to redirect the user to that part of our site when
-                  clicked. Remember that album.cover is the primary key
-                  for the photo that is the album cover, so it should be
-                  used when constructing the URL Django will make to point
-                  at the image, which is stored in S3... if it works that way.
-        <li><a href="{% url 'imagr_app:album_page' album.id %}"><img src="{% url 'imagr_app:photo_source' album.cover %}" height="128" width="128"></a></li>
-        -->
-        <li><a href="{% url 'imagr_app:album_page' album.id %}"><img src="{{ album.cover.image_url }}" height="128" width="128"></a></li>
-        <li><a href="{% url 'imagr_app:album_page' album.id %}">{{ album.title }}</a></li>
+        <!-- stripping the hrefs makes this page successfully display
+        the image stored in the photo referenced by the album's cover
+        link; in other words, the <img src= ... album.cover.image_url ... >
+        part WORKS on its own. -->
+        <li><a href="{% url 'imagr_app:index_page' album.id %}"><img src="{{ album.cover.image_url }}" height="128" width="128"></a></li>
+        <li><a href="{% url 'imagr_app:index_page' album.id %}">{{ album.title }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
