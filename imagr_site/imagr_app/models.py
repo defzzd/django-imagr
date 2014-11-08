@@ -1,6 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
-from datetime import datetime
+from django.contrib.auth.models import AbstractUser
+from django.conf import settings
+
 
 # Create your models here.
 
@@ -11,9 +12,8 @@ from datetime import datetime
 #         Users should be able to follow other users.
 #         Users should be able to see a list of the users the follow and the list of users following them.
 #         Users should have a 'date_joined' field and an 'active' field that allows disabling an account.
-class ImagrUser(AbstractBaseUser):
-    followers = models.ManyToManyField("self", symmetrical=False, related_name="ImagrUser_followers")
-    following = models.ManyToManyField("self", symmetrical=False, related_name="ImagrUser_following")
+class ImagrUser(AbstractUser):
+    following = models.ManyToManyField("self", symmetrical=False, related_name='followers')
     our_date_joined_field = models.DateField(auto_now_add=True)
     our_is_active_field = models.BooleanField(default=False)
 
@@ -26,10 +26,11 @@ PUBLISHED_CHOICES = (
     ("private", "Private Photo"),
     ("shared",  "Shared Photo"),
     ("public",  "Public Photo")
-    )
+)
+
 
 class Photo(models.Model):
-    user = models.ForeignKey(ImagrUser)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     title = models.CharField(max_length=20)
     description = models.CharField(max_length=140)
     date_uploaded = models.DateField(auto_now_add=True)
@@ -39,14 +40,18 @@ class Photo(models.Model):
                                 choices=PUBLISHED_CHOICES,
                                 default="private")
 
+    def __unicode__(self):
+        return self.title
 #     Album contains Photos and provide meta-data about the collection of photos they contain.
 #         Albums are owned by Users
 #         Any album can contain many Photos and any Photo may be in more than one Album.
 #         Meta-data should include a title and a description. Also a date created, date modified and date published as well as a published field containing the same three options described for Photos
 #         Users should be able to designate one contained photo as the 'cover' for the album.
 #         The albums created by a user may contain only Photos created by that same user.
+
+
 class Album(models.Model):
-    user = models.ForeignKey(ImagrUser)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     title = models.CharField(max_length=20)
     description = models.CharField(max_length=140)
     date_uploaded = models.DateField(auto_now_add=True)
@@ -57,6 +62,11 @@ class Album(models.Model):
                                 default="private")
     cover = models.ForeignKey(Photo, related_name='Album_cover')
     photos = models.ManyToManyField(Photo, related_name="Album_photos")
+
+    def __unicode__(self):
+        return self.title
+
+
 
 
 
