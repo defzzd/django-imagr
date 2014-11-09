@@ -6,8 +6,8 @@
         the image stored in the photo referenced by the album's cover
         link; in other words, the <img src= ... album.cover.image_url ... >
         part WORKS on its own. -->
-        <li><a href="{% url 'imagr_app:index_page' album.id %}"><img src="{{ album.cover.image_url }}" height="128" width="128"></a></li>
-        <li><a href="{% url 'imagr_app:index_page' album.id %}">{{ album.title }}</a></li>
+        <li><a href="{% url 'imagr_app:album_page' album.id %}"><img src="{{ album.cover.image_url }}" height="128" width="128"></a></li>
+        <li><a href="{% url 'imagr_app:album_page' album.id %}">{{ album.title }}</a></li>
     {% endfor %}
     </ul>
 {% else %}

@@ -5,8 +5,10 @@ from imagr_app import views
 
 urlpatterns = patterns('',
     url(r'^$', views.front_page, name='front_page'),
-    url(r'^home_page/$', views.home_page, name='home_page'),
+    url(r'^$', views.home_page, name='home_page'),
+    url(r'^(?P<album_id>\d+)/$', views.album_page, name='album_page'),
 
+    # url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
 )
 
 # url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
