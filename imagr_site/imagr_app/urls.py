@@ -8,6 +8,6 @@ urlpatterns = patterns('',
 
     # Alternate root page
     url(r'^album/(?P<album_id>\d+)$', views.album_page, name='album_page'),
-    url(r'^album/(?P<album_id>\d+)/photo/(?P<photo_id\d+)$', views.photo_page, name='photo_page'),
+    url(r'^album/(?P<album_id>\d+)/photo/(?P<photo_id>\d+)$', views.photo_page, name='photo_page'),
     url(r'^stream$', views.stream, name='stream')
 )
