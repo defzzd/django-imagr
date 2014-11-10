@@ -6,8 +6,7 @@ from models import ImagrUser, Photo, Album
 
 
 def front_page(request):
-    return render(request, 'imagr_app/front_page.html')
-
+    return home_page(request)
 
     #if request.user.is_authenticated():
         # This may need to call HttpResponseRequest() instead of render()
@@ -15,9 +14,10 @@ def front_page(request):
     #else:
     #    return render(request, 'imagr_app/front_page.html')
 
+
 def home_page(request):
     current_user = get_object_or_404(ImagrUser, pk=request.user.id)
-    user_albums = Album.objects.get(user=current_user)
+    user_albums = Album.objects.filter(user=current_user.id)
     context = {'user_albums': user_albums}
     return render(request, 'imagr_app/home_page.html', context)
 
@@ -29,9 +29,10 @@ def album_page(request, album_id):
     return render(request, 'imagr_app/album.html', context)
 
 
-def photo_page(request, photo_id):
+def photo_page(request, album_id, photo_id):
     photo = Photo.objects.get(id=photo_id)
-    context = {'photo': photo}
+    album = Album.objects.get(id=album_id)
+    context = {'album': album, 'photo': photo}
     return render(request, 'imagr_app/photo.html', context)
 
 
