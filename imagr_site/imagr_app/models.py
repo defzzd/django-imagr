@@ -1,5 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractUser
+from django.conf import settings
+
 from datetime import datetime
 
 # Create your models here.
@@ -11,13 +13,25 @@ from datetime import datetime
 #         Users should be able to follow other users.
 #         Users should be able to see a list of the users the follow and the list of users following them.
 #         Users should have a 'date_joined' field and an 'active' field that allows disabling an account.
-class ImagrUser(AbstractBaseUser):
-    identifier = models.CharField(max_length=40, unique=True, default=None)
-    followers = models.ManyToManyField("self", symmetrical=False, related_name="ImagrUser_followers")
-    following = models.ManyToManyField("self", symmetrical=False, related_name="ImagrUser_following")
+class ImagrUser(AbstractUser):
+    # followers = models.ForeignKey("self", related_name="+")
+    # following = models.ForeignKey("self", related_name="+")
     our_date_joined_field = models.DateField(auto_now_add=True)
     our_is_active_field = models.BooleanField(default=False)
-    USERNAME_FIELD = 'identifier'
+    following = models.ManyToManyField("self",
+                                       symmetrical=False,
+                                       related_name="followers",
+                                       blank=True)
+
+
+
+
+
+
+
+
+
+
 
 #     Photo contains an image and meta-data associated with that image
 #         Photos are owned by Users
@@ -31,7 +45,7 @@ PUBLISHED_CHOICES = (
     )
 
 class Photo(models.Model):
-    user = models.ForeignKey(ImagrUser)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     title = models.CharField(max_length=20)
     description = models.CharField(max_length=140)
     date_uploaded = models.DateField(auto_now_add=True)
@@ -40,6 +54,10 @@ class Photo(models.Model):
     published = models.CharField(max_length=7,
                                 choices=PUBLISHED_CHOICES,
                                 default="private")
+    # The name for an AWS S3 url is actually an object key.
+    # These object keys are sequences of Unicode characters
+    # whose UTF-8 encoding is at most 1024 bytes long.
+    image_url = models.CharField(max_length=1024, default="Photo Not Found")
 
 #     Album contains Photos and provide meta-data about the collection of photos they contain.
 #         Albums are owned by Users
@@ -48,7 +66,7 @@ class Photo(models.Model):
 #         Users should be able to designate one contained photo as the 'cover' for the album.
 #         The albums created by a user may contain only Photos created by that same user.
 class Album(models.Model):
-    user = models.ForeignKey(ImagrUser)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     title = models.CharField(max_length=20)
     description = models.CharField(max_length=140)
     date_uploaded = models.DateField(auto_now_add=True)

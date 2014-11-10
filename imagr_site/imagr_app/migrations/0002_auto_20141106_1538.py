@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
@@ -11,10 +12,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
+        migrations.AlterField(
             model_name='imagruser',
-            name='identifier',
-            field=models.CharField(default=None, unique=True, max_length=40),
+            name='following',
+            field=models.ManyToManyField(related_name='followers', to=settings.AUTH_USER_MODEL, blank=True),
             preserve_default=True,
         ),
     ]
