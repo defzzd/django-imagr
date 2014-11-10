@@ -7,13 +7,11 @@ from django.contrib.auth.decorators import login_required
 
 
 def front_page(request):
-    return home_page(request)
-
-    #if request.user.is_authenticated():
+    if request.user.is_authenticated():
         # This may need to call HttpResponseRequest() instead of render()
-    #    return render(request, 'imagr_app/home_page.html')
-    #else:
-    #    return render(request, 'imagr_app/front_page.html')
+        return home_page(request)
+    else:
+        return render(request, 'imagr_app/front_page.html')
 
 
 @login_required

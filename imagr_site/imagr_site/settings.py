@@ -26,7 +26,9 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
-LOGIN_URL = '/'
+LOGIN_URL = 'imagr_app_login'
+LOGOUT_URL = 'imagr_app_logout'
+LOGIN_REDIRECT_URL = '/'
 
 # Application definition
 
