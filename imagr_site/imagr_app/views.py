@@ -19,11 +19,14 @@ def front_page(request):
 def album_page(request, album_id):
     album = Album.objects.get(id=album_id)
     photos = album.photos.all()
-    context = {'photos':photos}
+    context = {'photos': photos}
     return render(request, 'imagr_app/album.html', context)
 
-def photo_page(request):
-    return HttpResponse("Photo Page")
+
+def photo_page(request, photo_id):
+    photo = Photo.objects.get(id=photo_id)
+    context = {'photo': photo}
+    return render(request, 'imagr_app/photo.html', context)
 
 
 def stream(request):
