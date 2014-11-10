@@ -15,11 +15,17 @@ def front_page(request):
     #else:
     #    return render(request, 'imagr_app/front_page.html')
 
+def home_page(request):
+    current_user = get_object_or_404(ImagrUser, pk=request.user.id)
+    user_albums = Album.objects.get(user=current_user)
+    context = {'user_albums': user_albums}
+    return render(request, 'imagr_app/home_page.html', context)
+
 
 def album_page(request, album_id):
     album = Album.objects.get(id=album_id)
     photos = album.photos.all()
-    context = {'photos': photos}
+    context = {'album': album, 'photos': photos}
     return render(request, 'imagr_app/album.html', context)
 
 
