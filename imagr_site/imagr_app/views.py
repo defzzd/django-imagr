@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.views import generic
 from django.shortcuts import get_object_or_404
 from models import ImagrUser, Photo, Album
+from django.contrib.auth.decorators import login_required
 
 
 def front_page(request):
@@ -15,6 +16,7 @@ def front_page(request):
     #    return render(request, 'imagr_app/front_page.html')
 
 
+@login_required
 def home_page(request):
     current_user = get_object_or_404(ImagrUser, pk=request.user.id)
     user_albums = Album.objects.filter(user=current_user.id)
@@ -22,6 +24,7 @@ def home_page(request):
     return render(request, 'imagr_app/home_page.html', context)
 
 
+@login_required
 def album_page(request, album_id):
     album = Album.objects.get(id=album_id)
     photos = album.photos.all()
@@ -29,6 +32,7 @@ def album_page(request, album_id):
     return render(request, 'imagr_app/album.html', context)
 
 
+@login_required
 def photo_page(request, album_id, photo_id):
     photo = Photo.objects.get(id=photo_id)
     album = Album.objects.get(id=album_id)
@@ -36,5 +40,6 @@ def photo_page(request, album_id, photo_id):
     return render(request, 'imagr_app/photo.html', context)
 
 
+@login_required
 def stream(request):
     return HttpResponse("Stream")
