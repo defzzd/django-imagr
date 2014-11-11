@@ -26,9 +26,9 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
-LOGIN_URL = '/'
-LOGOUT_URL = '/'
-LOGIN_REDIRECT_URL = '/'
+#LOGIN_URL = '/'
+#LOGOUT_URL = '/'
+LOGIN_REDIRECT_URL = 'front_page'
 
 # Application definition
 
