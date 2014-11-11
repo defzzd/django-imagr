@@ -10,9 +10,6 @@
     <p>Photo {{ this_photo.id }} not found at {{ this_photo.image_url }}.</p>
 
 <br><br>
-{% for each_album_id in this_photo.album_id_list %}
-    <a href="{% url 'imagr_app:album_page' each_album_id %}">Back to Album #{{ each_album_id }}</a>
-{% endfor %}
 
 {% endif %}
 <br><br>
