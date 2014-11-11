@@ -1,8 +1,7 @@
-<h3>Album Details</h3>
 
-{% if list_of_photos %}
+{% if recent_self_photos %}
     <ul>
-    {% for photo in list_of_photos %}
+    {% for photo in recent_self_photos %}
         <a href="{% url 'imagr_app:photo_page' photo.id %}"><img src="{{ photo.image_url }}"></a>
         <br>
         <a href="{% url 'imagr_app:photo_page' photo.id %}">{{ photo.title }}</a>
@@ -10,7 +9,7 @@
     {% endfor %}
     </ul>
 {% else %}
-    <p>There aren't any photos in this album.</p>
+    <p>You don't have any recent photos.</p>
 {% endif %}
 <br><br>
 <a href="{% url 'imagr_app:home_page'  %}">Back to Home Page</a>
