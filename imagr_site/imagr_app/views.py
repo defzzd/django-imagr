@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views import generic
 from django.shortcuts import get_object_or_404
 from models import ImagrUser, Photo, Album
@@ -11,14 +11,15 @@ def front_page(request):
         # This may need to call HttpResponseRequest() instead of render()
         return home_page(request)
     else:
-        return render(request, 'imagr_app/front_page.html')
+        return HttpResponseRedirect('accounts/login/')
+        #return HttpResponseRedirect(request, 'imagr_app/front_page.html')
 
 
 @login_required
 def home_page(request):
     current_user = get_object_or_404(ImagrUser, pk=request.user.id)
     user_albums = Album.objects.filter(user=current_user.id)
-    context = {'user_albums': user_albums}
+    context = {'current_user': current_user, 'user_albums': user_albums}
     return render(request, 'imagr_app/home_page.html', context)
 
 
@@ -40,4 +41,14 @@ def photo_page(request, album_id, photo_id):
 
 @login_required
 def stream(request):
-    return HttpResponse("Stream")
+
+    recent_user_photos = Photo.objects.filter(user=request.user.id).order_by('-date_uploaded')[:4]
+
+    for each_photo in recent_user_photos:
+        each_photo.album_id_list = []
+        for each_album_id in each_photo.Album_photos.id:
+            each_photo.album_id_list.append(each_album_id)
+
+    return render(request, 'imagr_app/stream.html', {'recent_user_photos': recent_user_photos})
+
+    #return HttpResponse("Stream")
