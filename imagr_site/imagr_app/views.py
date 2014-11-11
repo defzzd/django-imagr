@@ -119,8 +119,6 @@ def stream_page(request):
     # imagr_user_object = get_object_or_404(get_user_model(),
     #                                       pk=request.user.id)
 
-
-
     # filter_user_recent_photos =
     # list_of_photos = imagr_user_object.photo_set.get(user=request.user.id)
 
@@ -138,10 +136,53 @@ def stream_page(request):
     #     for each_album_id in photo.Album_photos.id:
     #         photo.album_id_list.append(each_album_id)
 
+    imagr_user_object = get_object_or_404(get_user_model(),
+                                          pk=request.user.id)
+
+
+
+    #recent_friend_photos = models.ImagrUser.objects.filter(following=request.user.id).photo_set.exclude(published="private").order_by('-date_uploaded')[:4]
+
+    #recent_friend_photos = models.Photo.objects.filter(user=all(get_user_model(), pk=request.user.id).following)
+
+    recent_friend_photos = []
+
+    for each_photo in models.Photo.objects.exclude(published="private").order_by('-date_uploaded')[:4]:
+        print("1" + str(each_photo))
+        print("1.5" + str(each_photo.user.followers.all()))
+        for each_user_object in each_photo.user.followers.all():
+            if request.user.id == each_user_object.id:
+                print("2" + str(request.user.id) + " == " + str(each_user_object.id))
+                recent_friend_photos.append(each_photo)
+
+    print("3" + str(recent_friend_photos))
+
+    #list_of_followed_users = imagr_user_object.following.all()
+
+    #recent_friend_photos = []
+
+    #for each_followed_user in list_of_followed_users:
+
+    #    followed_user_recent_shareable_photos = each_followed_user.filter(user=request.user.id).exclude(published="private").order_by('-date_uploaded')[:4]
+    #    for each_shareable_photo in followed_user_recent_shareable_photos:
+    #        recent_friend_photos.append(each_shareable_photo)
+
+    # To avoid having to parse this list of friends' shareable photos
+    # (which we can't easily do via Django, because we've already removed
+    # them from the thing that has exclude() and order_by() methods)
+    # we will instead take a random sample of a user's friends' recent photos:
+    import random
+    recent_friend_photos = random.sample(recent_friend_photos, min(len(recent_friend_photos), 4))
+
+    # Can't do this outside of a Django QuerySet object:
+    # recent_friend_photos = recent_friend_photos.order_by('-date_uploaded')[:4]
+
+
+
     return render(request,
                   'imagr_app/stream_page.html',
                   {'recent_self_photos': recent_self_photos,
-                   # 'recent_friend_photos': recent_friend_photos,
+                   'recent_friend_photos': recent_friend_photos,
                    },
                   )
 
