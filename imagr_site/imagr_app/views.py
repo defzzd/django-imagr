@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from models import ImagrUser, Photo, Album
 from django.contrib.auth.decorators import login_required
 import random
-
+from django.contrib.auth import get_user_model
 
 def front_page(request):
     if request.user.is_authenticated():
