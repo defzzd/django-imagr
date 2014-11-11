@@ -1,5 +1,6 @@
 
 {% if recent_self_photos %}
+    <h3>Your Recent Photos:</h3>
     <ul>
     {% for photo in recent_self_photos %}
         <a href="{% url 'imagr_app:photo_page' photo.id %}"><img src="{{ photo.image_url }}"></a>
@@ -10,6 +11,20 @@
     </ul>
 {% else %}
     <p>You don't have any recent photos.</p>
+}
+{% endif %}
+{% if recent_friend_photos %}
+    <h3>Friends' Recent Photos:</h3>
+    <ul>
+    {% for friend_photo in recent_friend_photos %}
+        <a href="{% url 'imagr_app:photo_page' friend_photo.id %}"><img src="{{ friend_photo.image_url }}"></a>
+        <br>
+        <a href="{% url 'imagr_app:photo_page' friend_photo.id %}">{{ friend_photo.title }}</a>
+        <br><br>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Your friends don't have any recent photos.</p>
 {% endif %}
 <br><br>
 <a href="{% url 'imagr_app:home_page'  %}">Back to Home Page</a>
