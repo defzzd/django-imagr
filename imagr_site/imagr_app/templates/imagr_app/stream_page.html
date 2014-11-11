@@ -2,14 +2,14 @@
 {% if recent_self_photos %}
     <ul>
     {% for photo in recent_self_photos %}
-        <a href="{% url 'imagr_app:photo_page' album_id photo.id %}"><img src="{{ photo.image_url }}"></a>
+        <a href="{% url 'imagr_app:photo_page' photo.id %}"><img src="{{ photo.image_url }}"></a>
         <br>
-        <a href="{% url 'imagr_app:photo_page' album_id photo.id %}">{{ photo.title }}</a>
+        <a href="{% url 'imagr_app:photo_page' photo.id %}">{{ photo.title }}</a>
         <br><br>
     {% endfor %}
     </ul>
 {% else %}
-    <p>There aren't any photos in this album.</p>
+    <p>You don't have any recent photos.</p>
 {% endif %}
 <br><br>
 <a href="{% url 'imagr_app:home_page'  %}">Back to Home Page</a>

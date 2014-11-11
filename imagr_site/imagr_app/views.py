@@ -4,10 +4,14 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.conf import settings
+from django.utils import timezone
 
 from django.views import generic
 
+import datetime
+
 import models
+
 
 
 def front_page(request):
@@ -43,8 +47,8 @@ def home_page(request):
     # to however context is handed through render()
     return render(request,
                   'imagr_app/home_page.html',
-                  {'list_of_albums': list_of_albums},
-                  )
+                  {'list_of_albums': list_of_albums
+                   },)
 
     # else:
     #     return HttpResponseRedirect(reverse('imagr_app:front_page'))
@@ -79,7 +83,7 @@ def album_page(request, album_id):
                       'imagr_app/album_page.html',
                       {'list_of_photos': list_of_photos,
                        'album_id': this_album.id
-                      },
+                       },
                       )
     else:
         return HttpResponseRedirect(reverse('imagr_app:front_page'))
@@ -89,27 +93,34 @@ def album_page(request, album_id):
 
 
 @login_required
-def photo_page(request, album_id, photo_id):
+def photo_page(request, photo_id):
 
     # if request.user.is_authenticated():
 
     this_photo = get_object_or_404(models.Photo,
                                    pk=photo_id)
 
-    if ((this_photo.published == 'public') or
-        (this_photo.user_id == request.user.id)):
+    # Provide this_photo with additional context:
+    # A list of the IDs of every album it belongs to.
+    # ...
+    # This does not work for some reason; it returns one ID sometimes
+    # outside of a list
+    this_photo.album_id_list = []
+    for each_album_id in [this_photo.Album_photos]:
+        this_photo.album_id_list.append(each_album_id)
+
+    if ((this_photo.published == 'public')
+       or (this_photo.user_id == request.user.id)):
+        # for photo in recent_self_photos:
 
         return render(request,
                       'imagr_app/photo_page.html',
                       {'this_photo': this_photo,
-                       'album_id': album_id,
-                      },
-                      )
+                       },)
+
     else:
         return HttpResponseRedirect(reverse('imagr_app:front_page'))
 
-from django.utils import timezone
-import datetime
 
 @login_required
 def stream_page(request):
@@ -128,16 +139,20 @@ def stream_page(request):
 
     recent_self_photos = models.Photo.objects.filter(user=request.user.id).order_by('-date_uploaded')[:4]
 
-    for photo in recent_self_photos:
-        photo.album_id = photo.Album_photos.id
+    # Don't know if we need the following code here.
+    # It gives album IDs to the stream_page for every photo
+    # as part of each photo object.
+    # for photo in recent_self_photos:
+    #     photo.album_id_list = []
+    #     for each_album_id in photo.Album_photos.id:
+    #         photo.album_id_list.append(each_album_id)
 
     return render(request,
-                   'imagr_app/stream_page.html',
-                   {
-                    'recent_self_photos': recent_self_photos,
-                    # 'recent_friend_photos': recent_friend_photos,
+                  'imagr_app/stream_page.html',
+                  {'recent_self_photos': recent_self_photos,
+                   # 'recent_friend_photos': recent_friend_photos,
                    },
-                   )
+                  )
 
 
 
