@@ -1,8 +1,9 @@
+<p>{{ current_user }}</p>
 {% if user_albums %}
     <ul>
     {% for album in user_albums %}
         <li>{{ album.cover }}</li>
-        <li><a href="imagr_app/{{ album.id }}/">{{ album.title }}</a></li>
+        <li><a href="album/{{ album.id }}">{{ album.title }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
