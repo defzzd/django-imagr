@@ -100,15 +100,6 @@ def photo_page(request, photo_id):
     this_photo = get_object_or_404(models.Photo,
                                    pk=photo_id)
 
-    # Provide this_photo with additional context:
-    # A list of the IDs of every album it belongs to.
-    # ...
-    # This does not work for some reason; it returns one ID sometimes
-    # outside of a list
-    this_photo.album_id_list = []
-    for each_album_id in [this_photo.Album_photos]:
-        this_photo.album_id_list.append(each_album_id)
-
     if ((this_photo.published == 'public')
        or (this_photo.user_id == request.user.id)):
         # for photo in recent_self_photos:
