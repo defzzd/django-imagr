@@ -88,4 +88,4 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'imagr_app.ImagrUser'
 
-
+LOGIN_URL = "/"

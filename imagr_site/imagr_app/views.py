@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.contrib.auth import authenticate, login, get_user_model
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.conf import settings
@@ -20,70 +21,123 @@ def front_page(request):
     else:
         return render(request, 'imagr_app/front_page.html')
 
-
+@login_required
 def home_page(request):
 
-    if request.user.is_authenticated():
-        # get_user_model() is how Django gives us the most flexibility
-        # when redefining User classes. This will pull the settings.py
-        # file's USER_AUTH_MODEL value, which is set by us, and use
-        # the Model the string is referring to to function as the project's
-        # base user. Calling get_user_model() here is like saying
-        # ImagrUser (the model name, that is), except this is more general.
-        imagr_user_object = get_object_or_404(get_user_model(),
-                                              pk=request.user.id)
+    # if request.user.is_authenticated():
 
-        user_id = imagr_user_object.id
-        list_of_albums = get_list_or_404(models.Album,
-                                         user=user_id)
+    # get_user_model() is how Django gives us the most flexibility
+    # when redefining User classes. This will pull the settings.py
+    # file's USER_AUTH_MODEL value, which is set by us, and use
+    # the Model the string is referring to to function as the project's
+    # base user. Calling get_user_model() here is like saying
+    # ImagrUser (the model name, that is), except this is more general.
+    imagr_user_object = get_object_or_404(get_user_model(),
+                                          pk=request.user.id)
 
-        # list_of_albums=list_of_albums may need to be changed
-        # to however context is handed through render()
-        return render(request,
-                      'imagr_app/home_page.html',
-                      {'list_of_albums': list_of_albums},
-                      )
+    user_id = imagr_user_object.id
+    list_of_albums = get_list_or_404(models.Album,
+                                     user=user_id)
 
-    else:
-        return HttpResponseRedirect(reverse('imagr_app:front_page'))
+    # list_of_albums=list_of_albums may need to be changed
+    # to however context is handed through render()
+    return render(request,
+                  'imagr_app/home_page.html',
+                  {'list_of_albums': list_of_albums},
+                  )
 
+    # else:
+    #     return HttpResponseRedirect(reverse('imagr_app:front_page'))
 
+@login_required
 def album_page(request, album_id):
 
-    if request.user.is_authenticated():
+    # if request.user.is_authenticated():
 
-        this_album = get_object_or_404(models.Album,
-                                       pk=album_id)
+    this_album = get_object_or_404(models.Album,
+                                   pk=album_id)
 
-        # User validation.
-        # If someone is not logged in but enters a URL with an album ID,
-        # the server will still try to server it up...
-        # ... unless we tell it not to, if the permissions do not permit
-        # this user to view this album. Permissions can be
-        # 'public', 'private' and 'shared' -- so 'shared' should probably
-        # cause a reference to the database that returns a list of users
-        # this user has shared this album with.
-        # But, that wasn't in the specifications, and there's no way to
-        # view users other than self right now.
-        imagr_user_object = get_object_or_404(get_user_model(),
-                                              pk=request.user.id)
+    # User validation.
+    # If someone is not logged in but enters a URL with an album ID,
+    # the server will still try to server it up...
+    # ... unless we tell it not to, if the permissions do not permit
+    # this user to view this album. Permissions can be
+    # 'public', 'private' and 'shared' -- so 'shared' should probably
+    # cause a reference to the database that returns a list of users
+    # this user has shared this album with.
+    # But, that wasn't in the specifications, and there's no way to
+    # view users other than self right now.
+    # imagr_user_object = get_object_or_404(get_user_model(),
+    #                                       pk=request.user.id)
 
-        if this_album.published == 'public':
-            if this_album.user_id == imagr_user_object.id:
+    if ((this_album.published == 'public') or
+        (this_album.user_id == request.user.id)):
 
-                list_of_photos = this_album.photos.all()
+        list_of_photos = this_album.photos.all()
 
-                return render(request,
-                              'imagr_app/album_page.html',
-                              {'list_of_photos': list_of_photos},
-                              )
-        else:
-            return HttpResponseRedirect(reverse('imagr_app:front_page'))
-
+        return render(request,
+                      'imagr_app/album_page.html',
+                      {'list_of_photos': list_of_photos,
+                       'album_id': this_album.id
+                      },
+                      )
     else:
         return HttpResponseRedirect(reverse('imagr_app:front_page'))
 
+    # else:
+    #     return HttpResponseRedirect(reverse('imagr_app:front_page'))
 
+
+@login_required
+def photo_page(request, album_id, photo_id):
+
+    # if request.user.is_authenticated():
+
+    this_photo = get_object_or_404(models.Photo,
+                                   pk=photo_id)
+
+    if ((this_photo.published == 'public') or
+        (this_photo.user_id == request.user.id)):
+
+        return render(request,
+                      'imagr_app/photo_page.html',
+                      {'this_photo': this_photo,
+                       'album_id': album_id,
+                      },
+                      )
+    else:
+        return HttpResponseRedirect(reverse('imagr_app:front_page'))
+
+from django.utils import timezone
+import datetime
+
+@login_required
+def stream_page(request):
+    # first, get the users' own recent photos
+    # imagr_user_object = get_object_or_404(get_user_model(),
+    #                                       pk=request.user.id)
+
+
+
+    # filter_user_recent_photos =
+    # list_of_photos = imagr_user_object.photo_set.get(user=request.user.id)
+
+    # Photo.
+    # now = timezone.now()
+    # now - datetime.timedelta(days=1) <= self.date_uploaded <= now
+
+    recent_self_photos = models.Photo.objects.filter(user=request.user.id).order_by('-date_uploaded')[:4]
+
+    for photo in recent_self_photos:
+        photo.album_id = photo.Album_photos.id
+
+    return render(request,
+                   'imagr_app/stream_page.html',
+                   {
+                    'recent_self_photos': recent_self_photos,
+                    # 'recent_friend_photos': recent_friend_photos,
+                   },
+                   )
 
 
 

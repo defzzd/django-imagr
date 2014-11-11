@@ -1,7 +1,7 @@
 
-{% if list_of_photos %}
+{% if recent_self_photos %}
     <ul>
-    {% for photo in list_of_photos %}
+    {% for photo in recent_self_photos %}
         <a href="{% url 'imagr_app:photo_page' album_id photo.id %}"><img src="{{ photo.image_url }}"></a>
         <br>
         <a href="{% url 'imagr_app:photo_page' album_id photo.id %}">{{ photo.title }}</a>
