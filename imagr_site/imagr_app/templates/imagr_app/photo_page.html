@@ -1,11 +1,16 @@
+<h3>Photo Details</h3>
+
 {% if this_photo %}
     <img src="{{ this_photo.image_url }}">
     <br>
     {{ this_photo.title }}
+    {{ this_photo.description }}
     <br><br>
 {% else %}
     <p>Photo {{ this_photo.id }} not found at {{ this_photo.image_url }}.</p>
+
+<br><br>
+
 {% endif %}
 <br><br>
-<a href="{% url 'imagr_app:album_page' album_id %}">Back to Album</a>
-
+<a href="{% url 'imagr_app:home_page' %}">Return Home</a>

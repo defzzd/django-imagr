@@ -3,16 +3,13 @@ from django.contrib import admin
 from .models import Photo, Album, ImagrUser
 
 
-# class PhotoAdmin(admin.ModelAdmin):
-#     fieldsets = [
-#         (None,               {'fields': ['title']}),
-#     ]
-#     list_display = ('title', 'image_url')
-#     search_fields = ['title']
+class PhotoAdmin(admin.ModelAdmin):
+    fieldsets = [
+        (None,               {'fields': ['title']}),
+    ]
+    list_display = ('title', 'image_url')
+    search_fields = ['title']
 
-#admin.site.register(Photo, PhotoAdmin)
-
-
-admin.site.register(Photo)
+admin.site.register(Photo, PhotoAdmin)
 admin.site.register(Album)
 admin.site.register(ImagrUser)
