@@ -34,7 +34,7 @@ def album_page(request, album_id):
 
 @login_required
 def photo_page(request, photo_id):
-    photo = Photo.objects.get(id=photo_id)
+    photo = get_object_or_404(Photo, pk=photo_id)
     context = {'photo': photo}
     return render(request, 'imagr_app/photo.html', context)
 
