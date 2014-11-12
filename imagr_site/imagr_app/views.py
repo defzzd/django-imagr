@@ -6,18 +6,16 @@ from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.utils import timezone
 
-from django.views import generic
-
 import datetime
 
 import models
 
 
-
 def front_page(request):
+    ''' The front_page shows anonymous users something
+    nice to encourage them to sign up. '''
 
-    # This view will send the user to the home_page if they're logged in
-    # and the front_page again if not (a bandaid for the login/signup screen).
+    # A bandaid for the login/signup screen.
 
     if request.user.is_authenticated():
         return home_page(request)
@@ -25,17 +23,18 @@ def front_page(request):
     else:
         return render(request, 'imagr_app/front_page.html')
 
+
 @login_required
 def home_page(request):
-
-    # if request.user.is_authenticated():
+    ''' The home_page shows logged-in users a list of their
+    albums, with a representative image from each album. '''
 
     # get_user_model() is how Django gives us the most flexibility
     # when redefining User classes. This will pull the settings.py
     # file's USER_AUTH_MODEL value, which is set by us, and use
     # the Model the string is referring to to function as the project's
     # base user. Calling get_user_model() here is like saying
-    # ImagrUser (the model name, that is), except this is more general.
+    # models.ImagrUser (the model name, that is), except this is more general.
     imagr_user_object = get_object_or_404(get_user_model(),
                                           pk=request.user.id)
 
@@ -43,39 +42,22 @@ def home_page(request):
     list_of_albums = get_list_or_404(models.Album,
                                      user=user_id)
 
-    # list_of_albums=list_of_albums may need to be changed
-    # to however context is handed through render()
     return render(request,
                   'imagr_app/home_page.html',
                   {'list_of_albums': list_of_albums
                    },)
 
-    # else:
-    #     return HttpResponseRedirect(reverse('imagr_app:front_page'))
 
 @login_required
 def album_page(request, album_id):
-
-    # if request.user.is_authenticated():
+    '''The album_page shows logged-in users
+    a display of photos in a single album.'''
 
     this_album = get_object_or_404(models.Album,
                                    pk=album_id)
 
-    # User validation.
-    # If someone is not logged in but enters a URL with an album ID,
-    # the server will still try to server it up...
-    # ... unless we tell it not to, if the permissions do not permit
-    # this user to view this album. Permissions can be
-    # 'public', 'private' and 'shared' -- so 'shared' should probably
-    # cause a reference to the database that returns a list of users
-    # this user has shared this album with.
-    # But, that wasn't in the specifications, and there's no way to
-    # view users other than self right now.
-    # imagr_user_object = get_object_or_404(get_user_model(),
-    #                                       pk=request.user.id)
-
     if ((this_album.published == 'public') or
-        (this_album.user_id == request.user.id)):
+       (this_album.user_id == request.user.id)):
 
         list_of_photos = this_album.photos.all()
 
@@ -88,21 +70,17 @@ def album_page(request, album_id):
     else:
         return HttpResponseRedirect(reverse('imagr_app:front_page'))
 
-    # else:
-    #     return HttpResponseRedirect(reverse('imagr_app:front_page'))
-
 
 @login_required
 def photo_page(request, photo_id):
-
-    # if request.user.is_authenticated():
+    ''' The photo_page shows logged-in users a
+    single photo along with details about it. '''
 
     this_photo = get_object_or_404(models.Photo,
                                    pk=photo_id)
 
     if ((this_photo.published == 'public')
        or (this_photo.user_id == request.user.id)):
-        # for photo in recent_self_photos:
 
         return render(request,
                       'imagr_app/photo_page.html',
@@ -115,69 +93,30 @@ def photo_page(request, photo_id):
 
 @login_required
 def stream_page(request):
-    # first, get the users' own recent photos
-    # imagr_user_object = get_object_or_404(get_user_model(),
-    #                                       pk=request.user.id)
-
-    # filter_user_recent_photos =
-    # list_of_photos = imagr_user_object.photo_set.get(user=request.user.id)
-
-    # Photo.
-    # now = timezone.now()
-    # now - datetime.timedelta(days=1) <= self.date_uploaded <= now
+    ''' The stream_page shows users their most recent photos along
+    with recent photos uploaded by those they are following. '''
 
     recent_self_photos = models.Photo.objects.filter(user=request.user.id).order_by('-date_uploaded')[:4]
-
-    # Don't know if we need the following code here.
-    # It gives album IDs to the stream_page for every photo
-    # as part of each photo object.
-    # for photo in recent_self_photos:
-    #     photo.album_id_list = []
-    #     for each_album_id in photo.Album_photos.id:
-    #         photo.album_id_list.append(each_album_id)
 
     imagr_user_object = get_object_or_404(get_user_model(),
                                           pk=request.user.id)
 
-
-
-    #recent_friend_photos = models.ImagrUser.objects.filter(following=request.user.id).photo_set.exclude(published="private").order_by('-date_uploaded')[:4]
-
-    #recent_friend_photos = models.Photo.objects.filter(user=all(get_user_model(), pk=request.user.id).following)
-
     recent_friend_photos = []
 
     for each_photo in models.Photo.objects.exclude(published="private").order_by('-date_uploaded')[:4]:
-        print("1" + str(each_photo))
-        print("1.5" + str(each_photo.user.followers.all()))
+
         for each_user_object in each_photo.user.followers.all():
+
             if request.user.id == each_user_object.id:
-                print("2" + str(request.user.id) + " == " + str(each_user_object.id))
+
                 recent_friend_photos.append(each_photo)
-
-    print("3" + str(recent_friend_photos))
-
-    #list_of_followed_users = imagr_user_object.following.all()
-
-    #recent_friend_photos = []
-
-    #for each_followed_user in list_of_followed_users:
-
-    #    followed_user_recent_shareable_photos = each_followed_user.filter(user=request.user.id).exclude(published="private").order_by('-date_uploaded')[:4]
-    #    for each_shareable_photo in followed_user_recent_shareable_photos:
-    #        recent_friend_photos.append(each_shareable_photo)
 
     # To avoid having to parse this list of friends' shareable photos
     # (which we can't easily do via Django, because we've already removed
-    # them from the thing that has exclude() and order_by() methods)
+    # them from the Manager with its exclude() and order_by() methods)
     # we will instead take a random sample of a user's friends' recent photos:
     import random
     recent_friend_photos = random.sample(recent_friend_photos, min(len(recent_friend_photos), 4))
-
-    # Can't do this outside of a Django QuerySet object:
-    # recent_friend_photos = recent_friend_photos.order_by('-date_uploaded')[:4]
-
-
 
     return render(request,
                   'imagr_app/stream_page.html',
@@ -185,27 +124,3 @@ def stream_page(request):
                    'recent_friend_photos': recent_friend_photos,
                    },
                   )
-
-
-
-# Note to future developers and/or self:
-# Triple quote blocks are NOT comments.
-# They are strings.
-# They will be loaded in memory as strings in a Python program during
-# execution and, if not set to a variable, they will be garbage-collected.
-# This makes them SEEM like comments, but they are NOT comments.
-# Comments don't use memory, strings do.
-
-# ++ A "front page" that shows anonymous users something nice to
-# ++    encourage them to sign up (don't worry that we lack a means for
-# ++    them to sign up yet.  We'll add that soon).
-
-# ++ A "home page" that shows logged-in users a list of their albums,
-# --    with a representative image from each album
-
-# An "album page" that shows logged-in users a display of photos in
-#     a single album
-# A "photo page" that shows logged-in users a single photo along with
-#     details about it.
-# A "stream" page that shows users their most recent photos along
-#     with recent photos uploaded by friends or those they are following.
