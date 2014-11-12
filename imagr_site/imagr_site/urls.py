@@ -9,5 +9,5 @@ urlpatterns = patterns('',
     url(r'^imagr_app/', include('imagr_app.urls', namespace="imagr_app")),
     url(r'^admin/', include(admin.site.urls)),
 
-    url(r'^accounts/', include('registration.backends.default.urls')),
+    url(r'^accounts/', include('registration.backends.simple.urls')),
 )

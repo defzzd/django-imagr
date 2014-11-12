@@ -28,6 +28,11 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+LOGIN_REDIRECT_URL = "imagr_app:front_page"
+
+#LOGIN_URL = "RegistrationView"
+
+#LOGOUT_URL
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -89,6 +94,6 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'imagr_app.ImagrUser'
 
-LOGIN_URL = "/"
+#LOGIN_URL = "/"
 
 ACCOUNT_ACTIVATION_DAYS = 60
