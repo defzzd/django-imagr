@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'imagr_app',
+    'registration',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -89,3 +90,5 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'imagr_app.ImagrUser'
 
 LOGIN_URL = "/"
+
+ACCOUNT_ACTIVATION_DAYS = 60
