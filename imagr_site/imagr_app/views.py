@@ -18,7 +18,7 @@ def front_page(request):
 
 @login_required
 def home_page(request):
-    current_user = get_object_or_404(ImagrUser, pk=request.user.id)
+    current_user = get_object_or_404(get_user_model(), pk=request.user.id)
     user_albums = Album.objects.filter(user=current_user.id)
     context = {'current_user': current_user, 'user_albums': user_albums}
     return render(request, 'imagr_app/home_page.html', context)
