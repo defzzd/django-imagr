@@ -28,7 +28,15 @@ ALLOWED_HOSTS = []
 
 #LOGIN_URL = '/'
 #LOGOUT_URL = '/'
-LOGIN_REDIRECT_URL = 'front_page'
+LOGIN_REDIRECT_URL = 'imagr_app:front_page'
+
+ACCOUNT_ACTIVATION_DAYS = 7
+
+EMAIL_HOST = 'smtp.mailgun.org'
+
+EMAIL_HOST_USER = 'postmaster@sandboxc05c58d13d3143b5a761460872fadcbc.mailgun.org'
+
+EMAIL_HOST_PASSWORD = 'b6e753c3840fd08b9089e1db9ab5e124'
 
 # Application definition
 
@@ -40,6 +48,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'imagr_app',
+    'registration'
 )
 
 MIDDLEWARE_CLASSES = (
