@@ -52,3 +52,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Known credential files in this repo
+imagr_site/imagr_site/credentials.py
