@@ -10,6 +10,8 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import credentials
+credentials.set_credentials()
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -36,7 +38,7 @@ EMAIL_HOST = 'smtp.mailgun.org'
 
 EMAIL_HOST_USER = 'postmaster@sandboxc05c58d13d3143b5a761460872fadcbc.mailgun.org'
 
-EMAIL_HOST_PASSWORD = 'b6e753c3840fd08b9089e1db9ab5e124'
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 # Application definition
 

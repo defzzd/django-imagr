@@ -6,14 +6,17 @@ from models import ImagrUser, Photo, Album
 from django.contrib.auth.decorators import login_required
 import random
 from django.contrib.auth import get_user_model
+from django.core.urlresolvers import reverse
+
 
 def front_page(request):
     if request.user.is_authenticated():
         # This may need to call HttpResponseRequest() instead of render()
         return home_page(request)
     else:
-        return HttpResponseRedirect('accounts/login/')
-        #return HttpResponseRedirect(request, 'imagr_app/front_page.html')
+        #We'll fix this later, once we've decided what to do with the front page
+        return home_page(request)
+        #return HttpResponseRedirect('imagr_app/front_page.html')
 
 
 @login_required
