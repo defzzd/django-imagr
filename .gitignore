@@ -52,3 +52,5 @@ docs/_build/
 
 # PyBuilder
 target/
+
+imagr_site/imagr_site/credentials.py
