@@ -11,13 +11,18 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+# settings for MailGun email
+EMAIL_PORT = 25
+EMAIL_HOST = os.environ['EMAIL_HOST']
+EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '8#o%qk@i&hk=3u3xs)sn_7_!tr5b+f_heai1875_9qk5$2r!ti'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -97,3 +102,4 @@ AUTH_USER_MODEL = 'imagr_app.ImagrUser'
 #LOGIN_URL = "/"
 
 ACCOUNT_ACTIVATION_DAYS = 60
+
