@@ -1,0 +1,12 @@
+<h1>Add new photo</h1>
+<h3> Missing or invalid entries will helpfully reset the form.</h3><br>
+
+<form enctype="multipart/form-data" method="post" action="">
+    {% csrf_token %}
+    {{ photo_form }}
+    <br><br>
+    <input type="submit" value="Upload Photo">
+</form>
+
+<br>
+<a href={% url 'imagr_app:front_page' %}>Back to Homepage</a>
