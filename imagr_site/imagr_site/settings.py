@@ -34,6 +34,8 @@ LOGIN_REDIRECT_URL = 'imagr_app:front_page'
 
 MEDIA_ROOT = 'imagr_app/static'
 
+#MEDIA_URL = 'imagr_app/static/'
+
 ACCOUNT_ACTIVATION_DAYS = 7
 
 EMAIL_HOST = 'smtp.mailgun.org'
