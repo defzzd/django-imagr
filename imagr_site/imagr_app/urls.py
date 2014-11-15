@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     url(r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'imagr_app/login.html'}),
     url(r'^album/(?P<album_id>\d+)$', views.album_page, name='album_page'),
     url(r'^photo/(?P<photo_id>\d+)$', views.photo_page, name='photo_page'),
-    url(r'^stream$', views.stream, name='stream')
+    url(r'^stream$', views.stream, name='stream'),
+    url(r'^submit_photo$', views.upload_photo, name='submit_photo'),
 
 )
