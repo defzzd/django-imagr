@@ -12,5 +12,6 @@ urlpatterns = patterns('',
     url(r'^photo/(?P<photo_id>\d+)$', views.photo_page, name='photo_page'),
     url(r'^stream$', views.stream, name='stream'),
     url(r'^submit_photo$', views.upload_photo, name='submit_photo'),
-
+    url(r'^create_album$', views.create_album, name='create_album'),
 )
+

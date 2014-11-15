@@ -38,6 +38,33 @@ def album_page(request, album_id):
 
 
 @login_required
+def create_album(request):
+    if request.method == 'POST':
+        form = AlbumForm(request.POST)
+        if form.is_valid():
+            new_album = Album.objects.create(
+                user=get_object_or_404(get_user_model(), pk=request.user.id),
+                title=form.cleaned_data['title'],
+                description=form.cleaned_data['description'],
+                published=form.cleaned_data['published'],
+                date_published=datetime.datetime.now(),
+                cover=form.cleaned_data['cover'])
+            photos = form.cleaned_data['photos']
+            print photos
+            for photo in photos:
+                new_album.photos.add(photo)
+            new_album.save()
+            
+            # Need to make this redirect to the album view of the new_album...after I determine all is well so far
+            return HttpResponseRedirect(reverse('imagr_app:stream'))
+    else:
+        form = AlbumForm()
+
+    context = {'album_form': form}
+    return render(request, 'imagr_app/create_album.html', context)
+
+
+@login_required
 def photo_page(request, photo_id):
     photo = get_object_or_404(Photo, pk=photo_id)
     context = {'photo': photo}
@@ -69,7 +96,6 @@ def upload_photo(request):
 @login_required
 def stream(request):
     recent_user_photos = Photo.objects.filter(user=request.user.id).order_by('-date_uploaded')[:4]
-    user = get_object_or_404(get_user_model(), pk=request.user.id)
     recent_friend_photos = []
 
     for photo in Photo.objects.exclude(published="private").order_by('-date_uploaded')[:4]:
