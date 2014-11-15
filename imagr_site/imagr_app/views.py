@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 import random
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
+from forms import AlbumForm, PhotoForm
+import datetime
 
 
 def front_page(request):
@@ -40,6 +42,28 @@ def photo_page(request, photo_id):
     photo = get_object_or_404(Photo, pk=photo_id)
     context = {'photo': photo}
     return render(request, 'imagr_app/photo.html', context)
+
+
+@login_required
+def upload_photo(request):
+    if request.method == 'POST':
+        form = PhotoForm(request.POST, request.FILES)
+        if form.is_valid():
+            new_photo = Photo.objects.create(
+                user=get_object_or_404(get_user_model(), pk=request.user.id),
+                title=form.cleaned_data['title'],
+                description=form.cleaned_data['description'],
+                published=form.cleaned_data['published'],
+                date_published=datetime.datetime.now(),
+                photo_data=form.cleaned_data['photo_data'])
+            new_photo.save()
+
+            return HttpResponseRedirect(reverse('imagr_app:stream'))
+    else:
+        form = PhotoForm()
+    
+    context = {'photo_form': form}
+    return render(request, 'imagr_app/submit_photo.html', context)
 
 
 @login_required
