@@ -32,13 +32,14 @@ PUBLISHED_CHOICES = (
 class Photo(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     title = models.CharField(max_length=20)
-    description = models.CharField(max_length=140)
+    description = models.CharField(max_length=300)
     date_uploaded = models.DateField(auto_now_add=True)
     date_modified = models.DateField(auto_now=True)
-    date_published = models.DateField()
+    date_published = models.DateField(null=True)
     published = models.CharField(max_length=7,
                                 choices=PUBLISHED_CHOICES,
                                 default="private")
+    photo_data = models.FileField(blank=True, max_length=1000)
 
     def __unicode__(self):
         return self.title
@@ -52,8 +53,8 @@ class Photo(models.Model):
 
 class Album(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    title = models.CharField(max_length=20)
-    description = models.CharField(max_length=140)
+    title = models.CharField(max_length=100)
+    description = models.CharField(max_length=300)
     date_uploaded = models.DateField(auto_now_add=True)
     date_modified = models.DateField(auto_now=True)
     date_published = models.DateField()
