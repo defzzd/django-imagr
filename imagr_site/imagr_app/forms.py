@@ -6,10 +6,10 @@ from imagr_app.models import Photo
 class AlbumForm(ModelForm):
     class Meta:
         model = Album
-        fields = ['title', 'description']
+        fields = ['title', 'description', 'photos', 'cover', 'published']
 
 
 class PhotoForm(ModelForm):
     class Meta:
         model = Photo
-        fields = ['title', 'description', 'published', 'photo_data']
+        fields = ['photo_data', 'title', 'description', 'published']
