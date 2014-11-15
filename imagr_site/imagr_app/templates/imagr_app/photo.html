@@ -1,5 +1,6 @@
 {% if photo %}
     <h1>{{ photo.title }}</h1>
+    <img src="../../static/{{ photo.photo_data }}" width="450" height="300">
 {% else %}
     <p>Could not find the specified photo</p>
 {% endif %}
