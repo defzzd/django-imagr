@@ -2,9 +2,9 @@
     <h3>Your recent photos</h3>
     <ul>
     {% for photo in user_photos %}
-        <a href="{% url 'imagr_app:photo_page' photo.id %}">{{ photo.title }}</a>
         <br>
-    <br><br>
+        <a href="{% url 'imagr_app:photo_page' photo.id %}">{{ photo.title }}</a><br>
+        <img src="../../static/{{ photo.photo_data }}" width="150" height="100">
     {% endfor %}
     </ul>
 {% else %}
