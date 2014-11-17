@@ -9,6 +9,7 @@ from django.utils import timezone
 import datetime
 
 import models
+import forms
 
 
 def front_page(request):
@@ -124,3 +125,91 @@ def stream_page(request):
                    'recent_friend_photos': recent_friend_photos,
                    },
                   )
+
+
+@login_required
+def add_photo(request):
+
+    invalidation_string = ''
+
+    if request.method == 'POST':
+
+        photo_form = forms.CreatePhotoForm(request.POST)
+
+        if photo_form.is_valid():
+            print(str(photo_form.cleaned_data))
+            imagr_user_object = get_object_or_404(get_user_model(),
+                                                  pk=request.user.id)
+            new_photo = models.Photo.objects.create(
+                user=imagr_user_object,
+                title=photo_form.cleaned_data['title'],
+                description=photo_form.cleaned_data['description'],
+                published=photo_form.cleaned_data['published'],
+                image_url=photo_form.cleaned_data['image_url'])
+
+            new_photo.save()
+
+            return HttpResponseRedirect(reverse('imagr_app:home_page'))
+
+        else:
+            invalidation_string = 'Invalid entry. All fields required, image URL must be a valid URL.'
+
+    # If a GET (or any other method), create a blank form.
+    else:
+        photo_form = forms.CreatePhotoForm()
+
+    return render(request, 'imagr_app/add_photo.html', {
+        'photo_form': photo_form,
+        'invalidation_string': invalidation_string,
+        })
+
+
+@login_required
+def add_album(request):
+
+    invalidation_string = ''
+
+    if request.method == 'POST':
+
+        album_form = forms.CreateAlbumForm(request.POST)
+
+        if album_form.is_valid():
+            print(str(album_form.cleaned_data))
+            imagr_user_object = get_object_or_404(get_user_model(),
+                                                  pk=request.user.id)
+            new_album = models.Album.objects.create(
+                user=imagr_user_object,
+                title=album_form.cleaned_data['title'],
+                description=album_form.cleaned_data['description'],
+                published=album_form.cleaned_data['published'],
+                cover=album_form.cleaned_data['cover'],
+                # You can't add the form's photos to the new Album object
+                # here, because a ManyToMany field cannot be given data
+                # upon creation of a new model instance.
+                # photos=album_form.cleaned_data['photos']
+                )
+            # Instead you must unpack the list and fill the photos field
+            # after the instance has been created:
+            photos_list = album_form.cleaned_data['photos']
+            for each_photo in photos_list:
+               new_album.photos.add(each_photo)
+            new_album.save()
+            # The args parameter is how we pass a variable to reverse():
+            return HttpResponseRedirect(reverse('imagr_app:album_page', args=[new_album.id]))
+
+        else:
+            invalidation_string = 'Invalid entry. All fields required, image URL must be a valid URL.'
+
+    # If a GET (or any other method), create a blank form.
+    else:
+        album_form = forms.CreateAlbumForm()
+
+    return render(request, 'imagr_app/add_album.html', {
+        'album_form': album_form,
+        'invalidation_string': invalidation_string,
+        })
+
+
+
+
+
