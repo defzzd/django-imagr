@@ -16,3 +16,6 @@
 {% else %}
     <p>You haven't made any albums yet.</p>
 {% endif %}
+<a href="{% url 'imagr_app:add_photo' %}">Add Photo</a>
+<br>
+<a href="{% url 'imagr_app:add_album' %}">Add Album</a>

@@ -4,13 +4,15 @@
     <img src="{{ this_photo.image_url }}">
     <br>
     {{ this_photo.title }}
+    <br>
     {{ this_photo.description }}
-    <br><br>
+    <br>
+    <br>
 {% else %}
     <p>Photo {{ this_photo.id }} not found at {{ this_photo.image_url }}.</p>
-
-<br><br>
-
+<br>
+<br>
 {% endif %}
-<br><br>
+<br>
+<br>
 <a href="{% url 'imagr_app:home_page' %}">Return Home</a>

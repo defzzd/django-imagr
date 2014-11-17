@@ -1,0 +1,17 @@
+
+
+<h1>Add new photo</h1>
+<h3>Missing or invalid entries will helpfully reset the form.</h3><br>
+
+{{ invalidation_string }}
+
+<form method="post" action="">
+    {% csrf_token %}
+    {{ photo_form }}
+    <br><br>
+    <input type="submit" value="Add Photo!">
+</form>
+
+
+<br>
+<a href="{% url 'imagr_app:home_page'  %}">Back to Home Page</a>
