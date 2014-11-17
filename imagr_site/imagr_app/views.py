@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.views import generic
 from django.shortcuts import get_object_or_404
 from models import ImagrUser, Photo, Album
@@ -50,7 +50,6 @@ def create_album(request):
                 date_published=datetime.datetime.now(),
                 cover=form.cleaned_data['cover'])
             photos = form.cleaned_data['photos']
-            print photos
             for photo in photos:
                 new_album.photos.add(photo)
             new_album.save()
@@ -62,6 +61,32 @@ def create_album(request):
 
     context = {'album_form': form}
     return render(request, 'imagr_app/create_album.html', context)
+
+
+@login_required
+def edit_album(request, album_id):
+    album = get_object_or_404(Album, pk=album_id)
+    #if album.user != get_user_model():
+        #return HttpResponseForbidden()
+    if request.method == 'POST':
+        form = AlbumForm(request.POST, instance=album, initial={'title': album.title, 'description': album.description})
+        if form.is_valid():
+            album.title = form.cleaned_data['title']
+            album.description = form.cleaned_data['description']
+            album.cover = form.cleaned_data['cover']
+            album.photos.clear()
+        photos = form.cleaned_data['photos']
+        for photo in photos:
+            print album
+            album.photos.add(photo)
+        album.save()
+        return HttpResponseRedirect(reverse('imagr_app:stream'))
+
+    else:
+        form = AlbumForm()
+
+    context = {'album_form': form}
+    return render(request, 'imagr_app/edit_album.html', context)
 
 
 @login_required

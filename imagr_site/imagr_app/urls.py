@@ -13,5 +13,6 @@ urlpatterns = patterns('',
     url(r'^stream$', views.stream, name='stream'),
     url(r'^submit_photo$', views.upload_photo, name='submit_photo'),
     url(r'^create_album$', views.create_album, name='create_album'),
+    url(r'^edit_album/(?P<album_id>\d+)$', views.edit_album, name='edit_album'),
 )
 
