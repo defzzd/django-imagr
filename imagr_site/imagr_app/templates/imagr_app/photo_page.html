@@ -8,6 +8,17 @@
     {{ this_photo.description }}
     <br>
     <br>
+    {% if this_photo_edit_form %}
+
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ this_photo_edit_form }}
+            <br><br>
+            <input type="submit" value="Edit Photo">
+        </form>
+
+    {% endif %}
+
 {% else %}
     <p>Photo {{ this_photo.id }} not found at {{ this_photo.image_url }}.</p>
 <br>

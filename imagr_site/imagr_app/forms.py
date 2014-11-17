@@ -26,6 +26,11 @@ class CreateAlbumForm(ModelForm):
         fields = ['title', 'description', 'published', 'cover', 'photos']
 
 
+# class EditPhotoForm(ModelForm):
+
+#     class Meta:
+#         model = models.Photo
+#         fields = ['title', 'description', 'published', 'image_url']
 
 
 # class CreatePhotoForm(forms.Form):

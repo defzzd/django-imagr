@@ -80,16 +80,60 @@ def photo_page(request, photo_id):
     this_photo = get_object_or_404(models.Photo,
                                    pk=photo_id)
 
+    context_dictionary = {}
+
     if ((this_photo.published == 'public')
        or (this_photo.user_id == request.user.id)):
 
-        return render(request,
-                      'imagr_app/photo_page.html',
-                      {'this_photo': this_photo,
-                       },)
+        context_dictionary['this_photo'] = this_photo
 
+    # If the user is not logged in and the photo is not public, send em back.
     else:
         return HttpResponseRedirect(reverse('imagr_app:front_page'))
+
+    # Editing of photos is now done on the photo_page itself.
+    invalidation_string = ''
+    context_dictionary['invalidation_string'] = invalidation_string
+
+    if (request.method == 'POST') and (request.user.id == this_photo.user_id):
+
+        photo_form = forms.CreatePhotoForm(request.POST)
+
+        if photo_form.is_valid():
+            print(str(photo_form.cleaned_data))
+
+            if photo_form.cleaned_data['title']:
+                this_photo.title = photo_form.cleaned_data['title']
+
+            if photo_form.cleaned_data['description']:
+                this_photo.description = photo_form.cleaned_data['description']
+
+            if photo_form.cleaned_data['published']:
+                this_photo.published = photo_form.cleaned_data['published']
+
+            if photo_form.cleaned_data['image_url']:
+                this_photo.image_url = photo_form.cleaned_data['image_url']
+
+            this_photo.save()
+
+            return render(request,
+                          'imagr_app/photo_page.html',
+                          context_dictionary)
+
+        else:
+            invalidation_string = 'Invalid entry. All fields required, image URL must be a valid URL.'
+    # If a GET (or any other method), create a blank form.
+    # NOTE: This must check for request.user.id == this_photo.user_id, or else
+    # non-users who can see the photo would be given an edit form, even
+    # though they couldn't actually submit it.
+    elif (request.user.id == this_photo.user_id):
+        this_photo_edit_form = forms.CreatePhotoForm()
+        context_dictionary['this_photo_edit_form'] = this_photo_edit_form
+        context_dictionary['invalidation_string'] = invalidation_string
+
+    return render(request,
+                  'imagr_app/photo_page.html',
+                  context_dictionary)
 
 
 @login_required
@@ -146,6 +190,7 @@ def add_photo(request):
                 description=photo_form.cleaned_data['description'],
                 published=photo_form.cleaned_data['published'],
                 image_url=photo_form.cleaned_data['image_url'])
+
 
             new_photo.save()
 
