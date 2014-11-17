@@ -68,7 +68,6 @@ WSGI_APPLICATION = 'imagr_site.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -78,6 +77,11 @@ DATABASES = {
         'HOST': 'localhost',
     }
 }
+# Thanks to Hybrid at:
+# http://stackoverflow.com/questions/21978562/django-test-error-permission-denied-to-create-database-using-heroku-postgres
+import sys
+if 'test' in sys.argv:
+    DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
