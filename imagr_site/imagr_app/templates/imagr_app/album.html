@@ -1,6 +1,7 @@
 {% if photos %}
     <ul>
     {% for photo in photos %}
+        <img src="../../static/{{ photo.photo_data }}" width="150" height="100">
         <li><a href="{% url 'imagr_app:photo_page' photo.id %}">{{ photo.title }}</a></li>
     {% endfor %}
     </ul>
