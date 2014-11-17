@@ -1,6 +1,9 @@
 {% if photo %}
-    <h1>{{ photo.title }}</h1>
+    <h2>{{ photo.title }}</h2>
     <img src="../../static/{{ photo.photo_data }}" width="450" height="300">
+    <p>{{ photo.description }}</p>
 {% else %}
     <p>Could not find the specified photo</p>
 {% endif %}
+<br><br>
+<a href="{% url 'imagr_app:front_page' %}">Back to HomePage</a>
