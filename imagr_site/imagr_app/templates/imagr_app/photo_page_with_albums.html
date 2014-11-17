@@ -1,0 +1,33 @@
+<h3>Photo Details</h3>
+
+{% if this_photo %}
+    <img src="{{ this_photo.image_url }}">
+    <br>
+    {{ this_photo.title }}
+    {{ this_photo.description }}
+    <br><br>
+
+    <h4>Albums this photo is in:</h4>
+    {% if list_of_albums %}
+    <ul>
+    {% for album in list_of_albums %}
+        <li><a href="{% url 'imagr_app:album_page' album.id %}"><img src="{{ album.cover.image_url }}" height="128" width="128"></a></li>
+        <li><a href="{% url 'imagr_app:album_page' album.id %}">{{ album.title }}</a></li>
+        <li>{{ album.description }}</li>
+    {% endfor %}
+    </ul>
+    {% else %}
+    <p>This photo is not in any albums.</p>
+    {% endif %}
+    <br><br>
+
+{% else %}
+    <p>Photo {{ this_photo.id }} not found at {{ this_photo.image_url }}.</p>
+
+<br><br>
+
+{% endif %}
+
+
+<br><br>
+<a href="{% url 'imagr_app:home_page' %}">Return Home</a>
