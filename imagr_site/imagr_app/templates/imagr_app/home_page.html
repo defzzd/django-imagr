@@ -1,9 +1,11 @@
-<p>{{ current_user }}</p>
+<p>{{ current_user }}'s albums</p>
 {% if user_albums %}
     <ul>
     {% for album in user_albums %}
-        <li>{{ album.cover }}</li>
-        <li><a href="{% url 'imagr_app:album_page' album.id %}">{{ album.title }}</a></li>
+        <a href="{% url 'imagr_app:album_page' album.id %}">{{ album.title }}</a>
+        <br>
+        <img src="../../static/{{ album.cover.photo_data }}" width="150" height="100">
+        <br><br>
     {% endfor %}
     </ul>
 {% else %}
