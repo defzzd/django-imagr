@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.test import TestCase, Client, RequestFactory
 from imagr_app.models import Photo, Album, ImagrUser
 
