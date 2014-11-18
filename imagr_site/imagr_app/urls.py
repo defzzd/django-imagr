@@ -14,5 +14,7 @@ urlpatterns = patterns('',
     url(r'^submit_photo$', views.upload_photo, name='submit_photo'),
     url(r'^create_album$', views.create_album, name='create_album'),
     url(r'^edit_album/(?P<album_id>\d+)$', views.edit_album, name='edit_album'),
+    url(r'^edit_photo/(?P<photo_id>\d+)$', views.edit_photo, name='edit_photo'),
+    url(r'^followers$', views.follow_page, name='followers'),
 )
 

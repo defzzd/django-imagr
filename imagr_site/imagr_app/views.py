@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 import random
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
-from forms import AlbumForm, PhotoForm
+from forms import AlbumForm, PhotoForm, EditPhotoForm, FollowForm
 import datetime
 
 
@@ -35,6 +35,27 @@ def album_page(request, album_id):
     photos = album.photos.all()
     context = {'album': album, 'photos': photos}
     return render(request, 'imagr_app/album.html', context)
+
+
+@login_required
+def follow_page(request):
+    current_user = get_object_or_404(get_user_model(), pk=request.user.id)
+    following = current_user.following.all()
+    followers = ImagrUser.objects.filter(following=current_user)
+    if request.method == 'POST':
+        form = FollowForm(requst.POST)
+        if form.is_valid():
+            current_user.following.clear()
+            new_friends = form.cleaned_data['following']
+            for friend in new_friends:
+                current_user.following.add(friend)
+            current_user.save()
+    else:
+        form = FollowForm
+
+    context = {'user': current_user, 'followers': followers, 'following': following, 'follow_form': form}
+    return render(request, 'imagr_app/follow_page.html', context)
+
 
 
 @login_required
@@ -69,7 +90,7 @@ def edit_album(request, album_id):
     #if album.user != get_user_model():
         #return HttpResponseForbidden()
     if request.method == 'POST':
-        form = AlbumForm(request.POST, instance=album, initial={'title': album.title, 'description': album.description})
+        form = AlbumForm(request.POST, instance=album)
         if form.is_valid():
             album.title = form.cleaned_data['title']
             album.description = form.cleaned_data['description']
@@ -116,6 +137,24 @@ def upload_photo(request):
     
     context = {'photo_form': form}
     return render(request, 'imagr_app/submit_photo.html', context)
+
+
+@login_required
+def edit_photo(request, photo_id):
+    photo = get_object_or_404(Photo, pk=photo_id)
+    if request.method == 'POST':
+        form = PhotoForm(request.POST, instance=photo)
+        if form.is_valid():
+            photo.title = form.cleaned_data['title']
+            photo.description = form.cleaned_data['description']
+        photo.save()
+        return HttpResponseRedirect(reverse('imagr_app:stream'))
+
+    else:
+        form = EditPhotoForm()
+
+    context = {'photo_form': form, 'photo': photo}
+    return render(request, 'imagr_app/edit_photo.html', context)
 
 
 @login_required
