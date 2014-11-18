@@ -59,11 +59,6 @@ def album_page(request, album_id):
     this_album = get_object_or_404(models.Album,
                                    pk=album_id)
 
-    # Used when altering forms' querysets, below, after form creation:
-    imagr_user_object = get_object_or_404(get_user_model(),
-                                          pk=request.user.id)
-
-
     context_dictionary = {}
     context_dictionary['this_album'] = this_album
 
@@ -113,7 +108,6 @@ def album_page(request, album_id):
             # after the album has been saved so the album view page
             # (which we redirect to after editing) reflects the
             # newly-edited data.
-            #initial_data_photos_list = this_album.photos.filter(user=request.user.id).exclude(published='private')
 
             initial_data = {'title': this_album.title,
                             'description': this_album.description,
@@ -122,8 +116,6 @@ def album_page(request, album_id):
                             'photos': this_album.photos.all()}
 
             this_album_edit_form = forms.EditAlbumForm(initial_data)
-            # 'public', because private would allow public albums to have private covers, and shared would be hard to implement:
-            #this_album_edit_form.fields.fields['cover'].queryset = models.Photo.objects.filter(user=imagr_user_object, published='public')
 
             context_dictionary['this_album_edit_form'] = this_album_edit_form
             invalidation_string = 'Album successfully updated.'
@@ -146,7 +138,6 @@ def album_page(request, album_id):
         # after the album has been saved so the album view page
         # (which we redirect to after editing) reflects the
         # newly-edited data.
-        #initial_data_photos_list = this_album.photos.filter(user=request.user.id).exclude(published='private')
 
         initial_data = {'title': this_album.title,
                         'description': this_album.description,
@@ -255,9 +246,6 @@ def stream_page(request):
     with recent photos uploaded by those they are following. '''
 
     recent_self_photos = models.Photo.objects.filter(user=request.user.id).order_by('-date_uploaded')[:4]
-
-    imagr_user_object = get_object_or_404(get_user_model(),
-                                          pk=request.user.id)
 
     recent_friend_photos = []
 
