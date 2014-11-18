@@ -1,8 +1,7 @@
-from django.forms import ModelForm
-#from django import forms
+
+from django import forms
 
 import models
-
 
 
 # PUBLISHED_CHOICES = (
@@ -12,18 +11,45 @@ import models
 #     )
 
 
-class CreatePhotoForm(ModelForm):
+class CreatePhotoForm(forms.ModelForm):
 
     class Meta:
         model = models.Photo
         fields = ['title', 'description', 'published', 'image_url']
 
 
-class CreateAlbumForm(ModelForm):
+class CreateAlbumForm(forms.ModelForm):
 
     class Meta:
         model = models.Album
         fields = ['title', 'description', 'published', 'cover', 'photos']
+
+
+# Some non-required fields when editing:
+class EditPhotoForm(forms.ModelForm):
+    title = forms.CharField(max_length=60, required=False)
+    description = forms.CharField(max_length=140, required=False)
+    image_url = forms.CharField(max_length=1024, required=False)
+
+    class Meta:
+        model = models.Photo
+        fields = ['title', 'description', 'published', 'image_url']
+
+
+class EditAlbumForm(forms.ModelForm):
+    title = forms.CharField(max_length=60, required=False)
+    description = forms.CharField(max_length=140, required=False)
+    #cover = forms.ModelChoiceField(queryset=None)
+    #photos = forms.ModelMultipleChoiceField(queryset=None)
+
+    class Meta:
+        model = models.Album
+        fields = ['title', 'description', 'published', 'cover', 'photos']
+
+    # def __init__(self, *args, **kwargs):
+    #     super(EditAlbumForm, self).__init__(*args, **kwargs)
+    #     self.fields['cover'] = forms.ModelChoiceField(queryset=None)
+    #     self.fields['photos'] = forms.ModelMultipleChoiceField(queryset=None)
 
 
 # class EditPhotoForm(ModelForm):
