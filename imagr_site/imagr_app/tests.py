@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import unittest
+import unittest import TestCase as unittestTestCase
 from django.test import TestCase, SimpleTestCase, TransactionTestCase
 from django.test import Client, RequestFactory
 from imagr_app.models import Photo, Album, ImagrUser
@@ -14,9 +14,22 @@ from django.test.utils import setup_test_environment, teardown_test_environment
 #  http://stackoverflow.com/questions/15073227/django-unit-test-simple-example
 # for getting the tests started
 
+# These tests require an imagr_app_testdata.json file. This must be
+#  in the imagr_app/fixtures directory.
+# If you wish to create new test data (and rewrite the tests that are
+#   dependent on data), all you need is this command:
+#
+# python manage.py dumpdata  > imagr_app/fixtures/imagr_app_testdata.json
+#
+#  (if you want the test data to look human readable, add "--indent 2"
+#   after "dumpdata" in the manage.py command above)
+
+
 # Create your tests here.
-
-
+# TestCase's need
+#  from django.test import TestCase
+# Note that there are two TestCase classes. One is in Django, and
+#  one is in unittest.
 class testImagrTestCase(TestCase):
     fixtures = ['imagr_app_testdata.json']
 
@@ -71,11 +84,11 @@ class testImagrSimpleTestCase(SimpleTestCase):
 
 
 # These test cases should be simple enough to require no Django
-class testImagrunittestTestCase(unittest.TestCase):
+class testImagrunittestTestCase(unittestTestCase):
     pass
 
 
 if __name__ == '__main__':
     setup_test_environment()
-    unittest.main()
+    unittestTestCase.main()
     teardown_test_environment()
