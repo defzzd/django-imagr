@@ -4,18 +4,18 @@ from .models import Photo, Album, ImagrUser
 
 
 class PhotoAdmin(admin.ModelAdmin):
-    # fieldsets = [
-    #     (None, {'fields': ['title']}),
-    #     (None, {'fields': ['description']}),
-    #     ]
 
-    # There isn't any 'create date' in the model.
+    # There is no 'create date' in the specs, but there are these...
     readonly_fields = ('date_uploaded', 'date_modified', 'date_published')
 
     # Reference:
     # http://stackoverflow.com/questions/2156114
     def name_url_field(self, obj):
-        return '<a href="%s%s">%s</a>' % ('http://localhost:8000/admin/imagr_app/imagruser/', obj.user.id, obj.user.username)
+        constructed_url_tag = '<a href="%s%s">%s</a>' \
+            % ('http://localhost:8000/admin/imagr_app/imagruser/',
+               obj.user.id,
+               obj.user.username)
+        return constructed_url_tag
     name_url_field.allow_tags = True
     name_url_field.short_description = 'Owner'
 
@@ -28,104 +28,66 @@ class PhotoAdmin(admin.ModelAdmin):
     # Let administrators sort the photos list by date_uploaded and user:
     list_filter = ['date_uploaded']
 
-    # Reference:
-    # http://stackoverflow.com/questions/16105756
-    #         /django-admin-search-field-for-model-with-one-to-one-field
-    # def user(self, obj):
-    #     return obj.user.id
-    # def user_email(self,obj):
-    #     return obj.user.email_address
-    # def user_first_name(self,obj):
-    #     return obj.user.first_name
-    # def user_last_name(self,obj):
-    #     return obj.user.last_name
-
     # Figured this out with the help of this StackOverflow post's responses
     # and a little bit of intuition:
     # http://stackoverflow.com/questions/11754877
     #        /troubleshooting-related-field-has-invalid-lookup-icontains
-    #
-    search_fields = ['user__username', 'user__email_address'] #, 'user_email_address', 'user_first_name', 'user_last_name']
-
-    # # Allow admins to search for individual entries by these fields:
-    # search_fields = ['title']
+    # ...
+    # 'user__email_address' gives me "does not support nested lookups"
+    # BUT 'user__email' works fine. I forgot to check the AbstractUser model
+    # for its email field, which is simply named "email".
+    search_fields = ['user__username',
+                     'user__email',
+                     'user__first_name',
+                     'user__last_name']
 
 
 class AlbumAdmin(admin.ModelAdmin):
-    # fieldsets = [
-    #     (None, {'fields': ['title']}),
-    #     (None, {'fields': ['description']}),
-    #     ]
 
-    # There isn't any 'create date' in the model.
     readonly_fields = ('date_uploaded', 'date_modified', 'date_published')
 
     # Reference:
     # http://stackoverflow.com/questions/2156114
     def name_url_field(self, obj):
-        return '<a href="%s%s">%s</a>' % ('http://localhost:8000/admin/imagr_app/imagruser/', obj.user.id, obj.user.username)
+        constructed_url_tag = '<a href="%s%s">%s</a>' \
+            % ('http://localhost:8000/admin/imagr_app/imagruser/',
+               obj.user.id,
+               obj.user.username)
+        return constructed_url_tag
     name_url_field.allow_tags = True
     name_url_field.short_description = 'Owner'
 
-    list_display = ('title', 'name_url_field', 'date_modified', 'date_uploaded')
+    list_display = ('title',
+                    'name_url_field',
+                    'date_modified',
+                    'date_uploaded')
 
     list_filter = ['date_uploaded']
-    search_fields = ['user']
+    search_fields = ['user__username',
+                     'user__email',
+                     'user__first_name',
+                     'user__last_name']
 
 
 class ImagrUserAdmin(admin.ModelAdmin):
-    # fieldsets = [
-    #     (None, {'fields': ['title']}),
-    #     (None, {'fields': ['description']}),
-    #     ]
 
-    readonly_fields = ('password', 'date_joined', 'last_login')
+    readonly_fields = ('password',
+                       'date_joined',
+                       'last_login')
 
-    list_display = ('username', 'last_login', 'date_joined')
+    list_display = ('username',
+                    'last_login',
+                    'date_joined')
 
-    # is_active is Django's User's is_active.
-    # It is NOT our_is_active, which is useless...
-    list_filter = ['date_joined', 'is_active']
+    list_filter = ['date_joined',
+                   'is_active']
+
+    search_fields = ['username',
+                     'email',
+                     'first_name',
+                     'last_name']
+
 
 admin.site.register(Photo, PhotoAdmin)
 admin.site.register(Album, AlbumAdmin)
 admin.site.register(ImagrUser, ImagrUserAdmin)
-
-
-# # # # Specifications # # # #
-
-# Using the documentation for the Django Admin (Links to an external site.),
-#     make the following customizations for "Imagr":
-
-# ++ Display upload, create and modification dates in admin pages as
-#        "read only" fields
-
-# ++ Display the name of the owner of a Photo or Album in the list view
-#        for each of those items
-
-# -- Display the file size of a photo as a column of data in the list view
-#        of Photos
-
-# ++ Allow administrators to click on the name of the owner of an Album or
-#        Photo to jump to the edit page for that specific user.
-
-# ++ Allow administrators to display all the photos created in a specific
-#        time period.
-
-# -- Allow administrators to search for albums or photos belonging to a
-#        specific user by username, first name, last name or email address
-
-# -- Allow administrators to search for users by username, first name, last
-#        name or email address
-
-# -- Allow administrators to display all photos uploaded that fall within
-#        a particular upload size:
-#            <= 1MB
-#            <= 10 MB
-#            <= 100 MB
-#            > 100 MB
-
-
-
-
-
