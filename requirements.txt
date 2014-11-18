@@ -1,5 +1,8 @@
 Django==1.7.1
 argparse==1.2.1
+django-registration-redux==1.1
 postgres==2.1.2
 psycopg2==2.5.4
+requests==2.4.3
+travis==0.0.2
 wsgiref==0.1.2
