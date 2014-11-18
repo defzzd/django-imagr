@@ -53,7 +53,8 @@ class EditAlbumForm(forms.ModelForm):
     #     self.fields['cover'] = forms.ModelChoiceField(queryset=None)
     #     self.fields['photos'] = forms.ModelMultipleChoiceField(queryset=None)
 
-class EditFollowUsersForm(forms.ModelForm):
+
+class EditFollowedUsersForm(forms.ModelForm):
 
     class Meta:
         model = models.ImagrUser

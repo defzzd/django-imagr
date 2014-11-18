@@ -1,0 +1,49 @@
+<h3>Your Followed Users Page</h3>
+
+
+{% if list_of_followed_users %}
+    <h3>Your Followed Users:</h3>
+    <ul>
+    {% for each_user in list_of_followed_users %}
+        {{ each_user.username }}
+        <br>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>You aren't following any users.</p>
+{% endif %}
+
+{% if invalidation_string %}
+    <h2>{{ invalidation_string }}</h2>
+    <br>
+{% endif %}
+
+{% if this_user_following_form %}
+    <br>
+    <h3>Edit Your Followed Users List:</h3>
+    <br>
+    <form method="post" action="">
+        {% csrf_token %}
+        {{ this_user_following_form }}
+        <br><br>
+        <input type="submit" value="Update Your Followed Users List">
+    </form>
+
+{% endif %}
+
+{% if users_following_this_user %}
+    <h3>Your Followers:</h3>
+    <ul>
+    {% for each_follower in users_following_this_user %}
+        {{ each_follower.username }}
+        <br>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>You don't have any followers yet.</p>
+{% endif %}
+
+<br>
+<a href="{% url 'imagr_app:stream_page'  %}">See Your Stream Page</a>
+<br>
+<a href="{% url 'imagr_app:home_page'  %}">Back to Home Page</a>

@@ -357,7 +357,7 @@ def add_album(request):
 
 
 @login_required
-def follow_page(request, album_id):
+def follow_page(request):
     '''The follow_page shows logged-in users
     a display of users they are following and
     allows them to follow and unfollow users.'''
@@ -371,16 +371,29 @@ def follow_page(request, album_id):
     # Listify it for the templating language:
     context_dictionary['list_of_followed_users'] = this_user.following.all()
 
+    users_following_this_user = models.ImagrUser.objects.filter(following=this_user)
+    context_dictionary['users_following_this_user'] = users_following_this_user
+
+    invalidation_string = ''
+
+    print("Got this far1")
+
     if request.method == 'POST':
 
-        this_user_following_form = forms.EditAlbumForm(request.POST)
+        print("Got this far2")
+
+        this_user_following_form = forms.EditFollowedUsersForm(request.POST)
         if this_user_following_form.is_valid():
             # print(str(this_user_following_form.cleaned_data))
+
+            print("Got this far3")
 
             if this_user_following_form.cleaned_data['following']:
                 this_user.following.clear()
                 for each_followed_user in this_user_following_form.cleaned_data['following']:
-                    user.following.add(each_followed_user)
+                    this_user.following.add(each_followed_user)
+
+                print("Got this far4")
 
             this_user.save()
 
@@ -390,13 +403,15 @@ def follow_page(request, album_id):
             # newly-edited data.
             #initial_data_photos_list = this_album.photos.filter(user=request.user.id).exclude(published='private')
 
-            initial_data = {'title': this_user.following.all()}
+            initial_data = {'following': this_user.following.all()}
 
             this_user_following_form = forms.EditFollowedUsersForm(initial_data)
 
             context_dictionary['this_user_following_form'] = this_user_following_form
             invalidation_string = 'Successfully updated your followed users list.'
             context_dictionary['invalidation_string'] = invalidation_string
+
+            print("Got this far5")
 
             return render(request,
                           'imagr_app/follow_page.html',
@@ -406,13 +421,15 @@ def follow_page(request, album_id):
             invalidation_string = 'Invalid entry, reason unknown.'
 
     # If a GET (or any other method), create a blank form.
-    else:
-        initial_data = {'title': imagr_user_object.following.all() }  # initial_data_photos_list}
+    # Actually, just hand them a blank form every time.
+    # It turns out there's no reason not to.
+    initial_data = {'following': this_user.following.all() }  # initial_data_photos_list}
 
-        this_user_following_form = forms.EditFollowedUsersForm(initial_data)
 
-        context_dictionary['this_user_following_form'] = this_user_following_form
-        context_dictionary['invalidation_string'] = invalidation_string
+    this_user_following_form = forms.EditFollowedUsersForm(initial_data)
+    context_dictionary['this_user_following_form'] = this_user_following_form
+
+    context_dictionary['invalidation_string'] = invalidation_string
 
     return render(request,
                   'imagr_app/follow_page.html',
