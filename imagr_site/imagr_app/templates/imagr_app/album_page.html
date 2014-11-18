@@ -1,16 +1,55 @@
-<h3>Album Details</h3>
+<h3>Album Details Page</h3>
 
-{% if list_of_photos %}
-    <ul>
-    {% for photo in list_of_photos %}
-        <a href="{% url 'imagr_app:photo_page' photo.id %}"><img src="{{ photo.image_url }}"></a>
+
+{% if this_album %}
+
+    {% if this_album.cover %}
+        <h3>Album Cover:</h3><a href="{% url 'imagr_app:photo_page' this_album.cover.id %}"><img src="{{ this_album.cover.image_url }}"></a>
+        <h3>Album Title:</h3>
+        <h1>{{ this_album.title }}</h1>
+        <h3>Album Description:</h3>
+        <p>{{ this_album.description }}</p>
+    {% endif %}
+
+    {% if list_of_photos %}
+        <h3>Album Contents:</h3>
+        <ul>
+        {% for photo in list_of_photos %}
+            <a href="{% url 'imagr_app:photo_page' photo.id %}"><img src="{{ photo.image_url }}"></a>
+            <br>
+            <a href="{% url 'imagr_app:photo_page' photo.id %}">{{ photo.title }}</a>
+            <br><br>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>There aren't any photos in this album.</p>
+    {% endif %}
+
+    {% if this_album_edit_form %}
         <br>
-        <a href="{% url 'imagr_app:photo_page' photo.id %}">{{ photo.title }}</a>
-        <br><br>
-    {% endfor %}
-    </ul>
+        <h3>Edit Album:</h3>
+        <br>
+        {% if invalidation_string %}
+            <br>
+            {{ invalidation_string }}
+            <br>
+            <br>
+        {% endif %}
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ this_album_edit_form }}
+            <br><br>
+            <input type="submit" value="Edit Album">
+        </form>
+
+    {% endif %}
+
 {% else %}
-    <p>There aren't any photos in this album.</p>
+    <p>Album #{{ this_album.id }} not found.</p>
+    <br>
+    <br>
+
 {% endif %}
-<br><br>
+<br>
+<br>
 <a href="{% url 'imagr_app:home_page'  %}">Back to Home Page</a>

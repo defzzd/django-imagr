@@ -1,15 +1,25 @@
-<h3>Photo Details</h3>
+<h3>Photo Details Page</h3>
 
 {% if this_photo %}
+    <h3>Photo:</h3>
     <img src="{{ this_photo.image_url }}">
     <br>
+    <h3>Title:</h3>
     {{ this_photo.title }}
     <br>
+    <h3>Description:</h3>
     {{ this_photo.description }}
     <br>
     <br>
     {% if this_photo_edit_form %}
-
+        <br>
+        <h3>Edit Photo:</h3>
+        <br>
+        {% if invalidation_string %}
+            <br>
+            {{ invalidation_string }}
+            <br>
+        {% endif %}
         <form method="post" action="">
             {% csrf_token %}
             {{ this_photo_edit_form }}
@@ -20,7 +30,7 @@
     {% endif %}
 
 {% else %}
-    <p>Photo {{ this_photo.id }} not found at {{ this_photo.image_url }}.</p>
+    <p>Photo #{{ this_photo.id }} not found at {{ this_photo.image_url }}.</p>
 <br>
 <br>
 {% endif %}
