@@ -25,6 +25,37 @@ def front_page(request):
         return render(request, 'imagr_app/front_page.html')
 
 
+
+
+
+
+
+
+@login_required
+def history_page(request):
+    ''' The user_history view shows logged-in users
+    a chronologically-sorted list of their photos. '''
+
+    imagr_user_object = get_object_or_404(get_user_model(),
+                                          pk=request.user.id)
+
+    # Might be able to alt-cmd-f all copies of this line into request.user.id
+    user_id = imagr_user_object.id
+
+    list_of_photos = models.Photo.objects.filter(user=user_id).order_by('-date_uploaded')[:20]
+    list_of_albums = models.Album.objects.filter(user=user_id).order_by('-date_uploaded')[:20]
+
+    return render(request,
+                  'imagr_app/history_page.html',
+                  {'list_of_photos': list_of_photos,
+                   'list_of_albums': list_of_albums
+                   },)
+
+
+
+
+
+
 @login_required
 def home_page(request):
     ''' The home_page shows logged-in users a list of their
