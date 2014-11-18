@@ -111,13 +111,12 @@ def album_page(request, album_id):
             # after the album has been saved so the album view page
             # (which we redirect to after editing) reflects the
             # newly-edited data.
-            initial_data_photos_list = this_album.photos.exclude(user=request.user.id).exclude(published='private')
+            #initial_data_photos_list = this_album.photos.filter(user=request.user.id).exclude(published='private')
 
             initial_data = {'title': this_album.title,
                             'description': this_album.description,
                             'published': this_album.published,
-                            'cover': this_album.cover.pk,
-                            'photos': initial_data_photos_list}
+                            'cover': this_album.cover.pk}
             print initial_data
 
             this_album_edit_form = forms.EditAlbumForm(initial_data)
@@ -145,18 +144,14 @@ def album_page(request, album_id):
         # after the album has been saved so the album view page
         # (which we redirect to after editing) reflects the
         # newly-edited data.
-        initial_data_photos_list = this_album.photos.exclude(user=request.user.id).exclude(published='private')
+        #initial_data_photos_list = this_album.photos.filter(user=request.user.id).exclude(published='private')
 
         initial_data = {'title': this_album.title,
                         'description': this_album.description,
                         'published': this_album.published,
-                        'cover': this_album.cover.pk,
-                        'photos': initial_data_photos_list}
-        print initial_data
+                        'cover': this_album.cover.pk}  # initial_data_photos_list}
 
         this_album_edit_form = forms.EditAlbumForm(initial_data)
-        # 'public', because private would allow public albums to have private covers, and shared would be hard to implement:
-        #this_album_edit_form.fields['cover'].queryset = models.Photo.objects.filter(user=imagr_user_object, published='public')
 
         context_dictionary['this_album_edit_form'] = this_album_edit_form
         context_dictionary['invalidation_string'] = invalidation_string
@@ -164,39 +159,6 @@ def album_page(request, album_id):
     return render(request,
                   'imagr_app/album_page.html',
                   context_dictionary)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 @login_required

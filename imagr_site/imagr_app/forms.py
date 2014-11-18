@@ -39,8 +39,10 @@ class EditPhotoForm(forms.ModelForm):
 class EditAlbumForm(forms.ModelForm):
     title = forms.CharField(max_length=60, required=False)
     description = forms.CharField(max_length=140, required=False)
-    #cover = forms.ModelChoiceField(queryset=None)
-    #photos = forms.ModelMultipleChoiceField(queryset=None)
+
+    # Pandora's box...!
+    # cover = forms.ModelChoiceField()
+    # photos = forms.ModelMultipleChoiceField()
 
     class Meta:
         model = models.Album
