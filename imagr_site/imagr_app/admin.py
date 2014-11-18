@@ -10,13 +10,23 @@ class PhotoAdmin(admin.ModelAdmin):
     #     ]
 
     # There isn't any 'create date' in the model.
-    readonly_fields = ('date_uploaded', 'date_modified')
+    readonly_fields = ('date_uploaded', 'date_modified', 'date_published')
+
+    # Reference:
+    # http://stackoverflow.com/questions/2156114
+    def name_url_field(self, obj):
+        return '<a href="%s%s">%s</a>' % ('http://localhost:8000/admin/imagr_app/imagruser/', obj.user.id, obj.user.username)
+    name_url_field.allow_tags = True
+    name_url_field.short_description = 'Owner'
+
     # There also is no 'file size' in the model since we aren't hosting.
-    list_display = ('title', 'image_url')
+    list_display = ('title', 'image_url', 'name_url_field')
 
     # Reference:
     # https://docs.djangoproject.com/
     #     en/1.7/intro/tutorial02/#customize-the-admin-index-page
+    # Let administrators sort the photos list by date_uploaded and user:
+    list_filter = ['date_uploaded', 'user']
 
     # # Allow admins to search for individual entries by these fields:
     # search_fields = ['title']
@@ -29,9 +39,18 @@ class AlbumAdmin(admin.ModelAdmin):
     #     ]
 
     # There isn't any 'create date' in the model.
-    readonly_fields = ('date_uploaded', 'date_modified')
+    readonly_fields = ('date_uploaded', 'date_modified', 'date_published')
 
-    list_display = ('title', 'user', 'date_modified', 'date_uploaded')
+    # Reference:
+    # http://stackoverflow.com/questions/2156114
+    def name_url_field(self, obj):
+        return '<a href="%s%s">%s</a>' % ('http://localhost:8000/admin/imagr_app/imagruser/', obj.user.id, obj.user.username)
+    name_url_field.allow_tags = True
+    name_url_field.short_description = 'Owner'
+
+    list_display = ('title', 'name_url_field', 'date_modified', 'date_uploaded')
+
+    list_filter = ['date_uploaded', 'user']
 
 
 class ImagrUserAdmin(admin.ModelAdmin):
@@ -44,6 +63,9 @@ class ImagrUserAdmin(admin.ModelAdmin):
 
     list_display = ('username', 'last_login', 'date_joined')
 
+    # is_active is Django's User's is_active.
+    # It is NOT our_is_active, which is useless...
+    list_filter = ['date_joined', 'is_active']
 
 admin.site.register(Photo, PhotoAdmin)
 admin.site.register(Album, AlbumAdmin)
@@ -67,7 +89,7 @@ admin.site.register(ImagrUser, ImagrUserAdmin)
 # -- Allow administrators to click on the name of the owner of an Album or
 #        Photo to jump to the edit page for that specific user.
 
-# -- Allow administrators to display all the photos created in a specific
+# ++ Allow administrators to display all the photos created in a specific
 #        time period.
 
 # -- Allow administrators to search for albums or photos belonging to a
