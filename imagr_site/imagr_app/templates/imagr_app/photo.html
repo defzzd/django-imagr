@@ -1,5 +1,5 @@
 {% if photo %}
-    <h2>{{ photo.title }}</h2>
+    <h2>{{ photo.title }} <a href="{% url 'imagr_app:edit_photo' photo.id %}">       Edit</a></h2>
     <img src="../../static/{{ photo.photo_data }}" width="450" height="300">
     <p>{{ photo.description }}</p>
 {% else %}
