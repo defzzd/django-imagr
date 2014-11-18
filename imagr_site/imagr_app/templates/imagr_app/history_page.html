@@ -1,0 +1,41 @@
+<h1>Home Page</h1>
+<h3><a href="{% url 'imagr_app:add_album' %}">Add Album!</a></h3>
+<h3><a href="{% url 'imagr_app:add_photo' %}">Add Photo!</a></h3>
+<h3><a href="{% url 'imagr_app:stream_page' %}">View Stream!</a></h3>
+<h3><a href="{% url 'imagr_app:home_page' %}">Return Home</a></h3>
+
+{% if list_of_albums %}
+    <ul>
+    <h1>Your Album History</h1>
+    {% for album in list_of_albums %}
+        <!-- stripping the hrefs makes this page successfully display
+        the image stored in the photo referenced by the album's cover
+        link; in other words, the <img src= ... album.cover.image_url ... >
+        part WORKS on its own. -->
+        <li><a href="{% url 'imagr_app:album_page' album.id %}"><img src="{{ album.cover.image_url }}" height="128" width="128"></a></li>
+        <li><a href="{% url 'imagr_app:album_page' album.id %}">{{ album.title }}</a> : Date uploaded: {{ album.date_uploaded }}</li>
+        <li>{{ album.description }}</li>
+
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>You haven't made any albums yet.</p>
+{% endif %}
+<br>
+{% if list_of_photos %}
+    <ul>
+    <h1>Your Photo History</h1>
+    {% for photo in list_of_photos %}
+        <!-- stripping the hrefs makes this page successfully display
+        the image stored in the photo referenced by the album's cover
+        link; in other words, the <img src= ... album.cover.image_url ... >
+        part WORKS on its own. -->
+        <li><a href="{% url 'imagr_app:photo_page' photo.id %}"><img src="{{ photo.image_url }}" height="128" width="128"></a></li>
+        <li><a href="{% url 'imagr_app:photo_page' photo.id %}">{{ photo.title }}</a> : Date uploaded: {{ photo.date_uploaded }}</li>
+        <li>{{ photo.description }}</li>
+
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>You haven't submitted any photos yet.</p>
+{% endif %}
