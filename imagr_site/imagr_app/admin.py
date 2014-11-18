@@ -26,7 +26,26 @@ class PhotoAdmin(admin.ModelAdmin):
     # https://docs.djangoproject.com/
     #     en/1.7/intro/tutorial02/#customize-the-admin-index-page
     # Let administrators sort the photos list by date_uploaded and user:
-    list_filter = ['date_uploaded', 'user']
+    list_filter = ['date_uploaded']
+
+    # Reference:
+    # http://stackoverflow.com/questions/16105756
+    #         /django-admin-search-field-for-model-with-one-to-one-field
+    # def user(self, obj):
+    #     return obj.user.id
+    # def user_email(self,obj):
+    #     return obj.user.email_address
+    # def user_first_name(self,obj):
+    #     return obj.user.first_name
+    # def user_last_name(self,obj):
+    #     return obj.user.last_name
+
+    # Figured this out with the help of this StackOverflow post's responses
+    # and a little bit of intuition:
+    # http://stackoverflow.com/questions/11754877
+    #        /troubleshooting-related-field-has-invalid-lookup-icontains
+    #
+    search_fields = ['user__username', 'user__email_address'] #, 'user_email_address', 'user_first_name', 'user_last_name']
 
     # # Allow admins to search for individual entries by these fields:
     # search_fields = ['title']
@@ -50,7 +69,8 @@ class AlbumAdmin(admin.ModelAdmin):
 
     list_display = ('title', 'name_url_field', 'date_modified', 'date_uploaded')
 
-    list_filter = ['date_uploaded', 'user']
+    list_filter = ['date_uploaded']
+    search_fields = ['user']
 
 
 class ImagrUserAdmin(admin.ModelAdmin):
@@ -77,7 +97,7 @@ admin.site.register(ImagrUser, ImagrUserAdmin)
 # Using the documentation for the Django Admin (Links to an external site.),
 #     make the following customizations for "Imagr":
 
-# +- Display upload, create and modification dates in admin pages as
+# ++ Display upload, create and modification dates in admin pages as
 #        "read only" fields
 
 # ++ Display the name of the owner of a Photo or Album in the list view
@@ -86,7 +106,7 @@ admin.site.register(ImagrUser, ImagrUserAdmin)
 # -- Display the file size of a photo as a column of data in the list view
 #        of Photos
 
-# -- Allow administrators to click on the name of the owner of an Album or
+# ++ Allow administrators to click on the name of the owner of an Album or
 #        Photo to jump to the edit page for that specific user.
 
 # ++ Allow administrators to display all the photos created in a specific
