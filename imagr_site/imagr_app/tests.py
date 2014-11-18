@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import unittest import TestCase as unittestTestCase
+from unittest import TestCase as unittestTestCase
 from django.test import TestCase, SimpleTestCase, TransactionTestCase
 from django.test import Client, RequestFactory
 from imagr_app.models import Photo, Album, ImagrUser
