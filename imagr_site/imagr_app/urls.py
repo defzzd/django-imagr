@@ -11,6 +11,7 @@ urlpatterns = patterns('',
     url(r'^stream/$', views.stream_page, name='stream_page'),
     url(r'^add_photo/$', views.add_photo, name='add_photo'),
     url(r'^add_album/$', views.add_album, name='add_album'),
+    url(r'^follow/$', views.follow_page, name='follow_page'),
 
     # url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
 )
