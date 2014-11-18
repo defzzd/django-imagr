@@ -362,4 +362,68 @@ def follow_page(request, album_id):
     a display of users they are following and
     allows them to follow and unfollow users.'''
 
-    pass
+    # Used when altering forms' querysets below, after form creation:
+    this_user = get_object_or_404(get_user_model(),
+                                          pk=request.user.id)
+
+    context_dictionary = {}
+    # context_dictionary['this_user'] = imagr_user_object
+    # Listify it for the templating language:
+    context_dictionary['list_of_followed_users'] = this_user.following.all()
+
+    if request.method == 'POST':
+
+        this_user_following_form = forms.EditAlbumForm(request.POST)
+        if this_user_following_form.is_valid():
+            # print(str(this_user_following_form.cleaned_data))
+
+            if this_user_following_form.cleaned_data['following']:
+                this_user.following.clear()
+                for each_followed_user in this_user_following_form.cleaned_data['following']:
+                    user.following.add(each_followed_user)
+
+            this_user.save()
+
+            # Violating DRY here because this needs to be refreshed
+            # after the album has been saved so the album view page
+            # (which we redirect to after editing) reflects the
+            # newly-edited data.
+            #initial_data_photos_list = this_album.photos.filter(user=request.user.id).exclude(published='private')
+
+            initial_data = {'title': this_user.following.all()}
+
+            this_user_following_form = forms.EditFollowedUsersForm(initial_data)
+
+            context_dictionary['this_user_following_form'] = this_user_following_form
+            invalidation_string = 'Successfully updated your followed users list.'
+            context_dictionary['invalidation_string'] = invalidation_string
+
+            return render(request,
+                          'imagr_app/follow_page.html',
+                          context_dictionary)
+
+        else:
+            invalidation_string = 'Invalid entry, reason unknown.'
+
+    # If a GET (or any other method), create a blank form.
+    else:
+        initial_data = {'title': imagr_user_object.following.all() }  # initial_data_photos_list}
+
+        this_user_following_form = forms.EditFollowedUsersForm(initial_data)
+
+        context_dictionary['this_user_following_form'] = this_user_following_form
+        context_dictionary['invalidation_string'] = invalidation_string
+
+    return render(request,
+                  'imagr_app/follow_page.html',
+                  context_dictionary)
+
+
+
+
+
+
+
+
+
+
