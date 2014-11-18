@@ -52,7 +52,9 @@ def home_page(request):
 @login_required
 def album_page(request, album_id):
     '''The album_page shows logged-in users
-    a display of photos in a single album.'''
+    a display of photos in a single album,
+    and allows logged-in users the ability
+    to edit the album's details. '''
 
     this_album = get_object_or_404(models.Album,
                                    pk=album_id)
@@ -116,8 +118,8 @@ def album_page(request, album_id):
             initial_data = {'title': this_album.title,
                             'description': this_album.description,
                             'published': this_album.published,
-                            'cover': this_album.cover.pk}
-            print initial_data
+                            'cover': this_album.cover.pk,
+                            'photos': this_album.photos.all()}
 
             this_album_edit_form = forms.EditAlbumForm(initial_data)
             # 'public', because private would allow public albums to have private covers, and shared would be hard to implement:
@@ -149,7 +151,8 @@ def album_page(request, album_id):
         initial_data = {'title': this_album.title,
                         'description': this_album.description,
                         'published': this_album.published,
-                        'cover': this_album.cover.pk}  # initial_data_photos_list}
+                        'cover': this_album.cover.pk,
+                        'photos': this_album.photos.all()}  # initial_data_photos_list}
 
         this_album_edit_form = forms.EditAlbumForm(initial_data)
 
@@ -164,7 +167,9 @@ def album_page(request, album_id):
 @login_required
 def photo_page(request, photo_id):
     ''' The photo_page shows logged-in users a
-    single photo along with details about it. '''
+    single photo along with details about it,
+    and allows logged-in users the ability to
+    edit the photo's details. '''
 
     this_photo = get_object_or_404(models.Photo,
                                    pk=photo_id)
@@ -205,7 +210,8 @@ def photo_page(request, photo_id):
 
             this_photo.save()
 
-            # Violating DRY here so we can update the defaults after updating the model after submitting a post... yeah.
+            # Violating DRY here so we can update the defaults after
+            # updating the model after submitting a post... yeah.
             initial_data = {'title': this_photo.title,
                             'description': this_photo.description,
                             'published': this_photo.published,
@@ -221,7 +227,8 @@ def photo_page(request, photo_id):
                           context_dictionary)
 
         else:
-            invalidation_string = 'Invalid entry. Image URL must be a valid URL.'
+            invalidation_string = 'Error: Image URL must be a valid URL.'
+
     # If a GET (or any other method), create a blank form.
     # NOTE: This must check for request.user.id == this_photo.user_id, or else
     # non-users who can see the photo would be given an edit form, even
@@ -361,15 +368,10 @@ def add_album(request):
         })
 
 
+@login_required
+def follow_page(request, album_id):
+    '''The follow_page shows logged-in users
+    a display of users they are following and
+    allows them to follow and unfollow users.'''
 
-
-
-
-
-
-
-
-
-
-
-
+    pass
