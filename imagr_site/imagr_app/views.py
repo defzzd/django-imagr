@@ -16,8 +16,6 @@ def front_page(request):
     ''' The front_page shows anonymous users something
     nice to encourage them to sign up. '''
 
-    # A bandaid for the login/signup screen.
-
     if request.user.is_authenticated():
         return home_page(request)
 
@@ -25,16 +23,10 @@ def front_page(request):
         return render(request, 'imagr_app/front_page.html')
 
 
-
-
-
-
-
-
 @login_required
 def history_page(request):
     ''' The user_history view shows logged-in users
-    a chronologically-sorted list of their photos. '''
+    a chronologically-ordered list of their photos. '''
 
     imagr_user_object = get_object_or_404(get_user_model(),
                                           pk=request.user.id)
@@ -42,18 +34,15 @@ def history_page(request):
     # Might be able to alt-cmd-f all copies of this line into request.user.id
     user_id = imagr_user_object.id
 
-    list_of_photos = models.Photo.objects.filter(user=user_id).order_by('-date_uploaded')[:20]
-    list_of_albums = models.Album.objects.filter(user=user_id).order_by('-date_uploaded')[:20]
+    list_of_photos = models.Photo.objects.filter(
+        user=user_id).order_by('-date_uploaded')[:20]
+    list_of_albums = models.Album.objects.filter(
+        user=user_id).order_by('-date_uploaded')[:20]
 
     return render(request,
                   'imagr_app/history_page.html',
                   {'list_of_photos': list_of_photos,
-                   'list_of_albums': list_of_albums
-                   },)
-
-
-
-
+                   'list_of_albums': list_of_albums})
 
 
 @login_required
@@ -103,26 +92,28 @@ def album_page(request, album_id):
         return HttpResponseRedirect(reverse('imagr_app:front_page'))
 
     # Editing of albums is now done on the album_page itself.
-    invalidation_string = ''
-    context_dictionary['invalidation_string'] = invalidation_string
+    context_string = ''
+    context_dictionary['context_string'] = context_string
 
     if (request.method == 'POST') and (request.user.id == this_album.user_id):
 
         this_album_edit_form = forms.EditAlbumForm(request.POST)
         if this_album_edit_form.is_valid():
-            #print(str(this_album_edit_form.cleaned_data))
 
             if this_album_edit_form.cleaned_data['title']:
                 this_album.title = this_album_edit_form.cleaned_data['title']
 
             if this_album_edit_form.cleaned_data['description']:
-                this_album.description = this_album_edit_form.cleaned_data['description']
+                this_album.description \
+                    = this_album_edit_form.cleaned_data['description']
 
             if this_album_edit_form.cleaned_data['published']:
-                this_album.published = this_album_edit_form.cleaned_data['published']
+                this_album.published \
+                    = this_album_edit_form.cleaned_data['published']
 
             if this_album_edit_form.cleaned_data['cover']:
-                this_album.cover = this_album_edit_form.cleaned_data['cover']
+                this_album.cover \
+                    = this_album_edit_form.cleaned_data['cover']
 
             if this_album_edit_form.cleaned_data['photos']:
                 # "Editing" the album can mean removing photos.
@@ -149,15 +140,15 @@ def album_page(request, album_id):
             this_album_edit_form = forms.EditAlbumForm(initial_data)
 
             context_dictionary['this_album_edit_form'] = this_album_edit_form
-            invalidation_string = 'Album successfully updated.'
-            context_dictionary['invalidation_string'] = invalidation_string
+            context_string = 'Album successfully updated.'
+            context_dictionary['context_string'] = context_string
 
             return render(request,
                           'imagr_app/album_page.html',
                           context_dictionary)
 
         else:
-            invalidation_string = 'Invalid entry: all fields required.'
+            context_string = 'Invalid entry: all fields required.'
 
     # If a GET (or any other method), create a blank form.
     # NOTE: This must check for request.user.id == this_photo.user_id, or else
@@ -174,12 +165,12 @@ def album_page(request, album_id):
                         'description': this_album.description,
                         'published': this_album.published,
                         'cover': this_album.cover.pk,
-                        'photos': this_album.photos.all()}  # initial_data_photos_list}
+                        'photos': this_album.photos.all()}
 
         this_album_edit_form = forms.EditAlbumForm(initial_data)
 
         context_dictionary['this_album_edit_form'] = this_album_edit_form
-        context_dictionary['invalidation_string'] = invalidation_string
+        context_dictionary['context_string'] = context_string
 
     return render(request,
                   'imagr_app/album_page.html',
@@ -208,8 +199,8 @@ def photo_page(request, photo_id):
         return HttpResponseRedirect(reverse('imagr_app:front_page'))
 
     # Editing of photos is now done on the photo_page itself.
-    invalidation_string = ''
-    context_dictionary['invalidation_string'] = invalidation_string
+    context_string = ''
+    context_dictionary['context_string'] = context_string
 
     if (request.method == 'POST') and (request.user.id == this_photo.user_id):
 
@@ -241,15 +232,15 @@ def photo_page(request, photo_id):
 
             this_photo_edit_form = forms.EditPhotoForm(initial_data)
             context_dictionary['this_photo_edit_form'] = this_photo_edit_form
-            invalidation_string = 'Photo successfully updated.'
-            context_dictionary['invalidation_string'] = invalidation_string
+            context_string = 'Photo successfully updated.'
+            context_dictionary['context_string'] = context_string
 
             return render(request,
                           'imagr_app/photo_page.html',
                           context_dictionary)
 
         else:
-            invalidation_string = 'Error: Image URL must be a valid URL.'
+            context_string = 'Error: Image URL must be a valid URL.'
 
     # If a GET (or any other method), create a blank form.
     # NOTE: This must check for request.user.id == this_photo.user_id, or else
@@ -264,7 +255,7 @@ def photo_page(request, photo_id):
 
         this_photo_edit_form = forms.EditPhotoForm(initial_data)
         context_dictionary['this_photo_edit_form'] = this_photo_edit_form
-        context_dictionary['invalidation_string'] = invalidation_string
+        context_dictionary['context_string'] = context_string
 
     return render(request,
                   'imagr_app/photo_page.html',
@@ -276,11 +267,15 @@ def stream_page(request):
     ''' The stream_page shows users their most recent photos along
     with recent photos uploaded by those they are following. '''
 
-    recent_self_photos = models.Photo.objects.filter(user=request.user.id).order_by('-date_uploaded')[:4]
+    recent_self_photos = models.Photo.objects.filter(
+        user=request.user.id).order_by('-date_uploaded')[:4]
 
     recent_friend_photos = []
 
-    for each_photo in models.Photo.objects.exclude(published="private").order_by('-date_uploaded')[:4]:
+    ordered_shared_nonprivate_photos = models.Photo.objects.exclude(
+        published="private").order_by('-date_uploaded')[:4]
+
+    for each_photo in ordered_shared_nonprivate_photos:
 
         for each_user_object in each_photo.user.followers.all():
 
@@ -293,20 +288,21 @@ def stream_page(request):
     # them from the Manager with its exclude() and order_by() methods)
     # we will instead take a random sample of a user's friends' recent photos:
     import random
-    recent_friend_photos = random.sample(recent_friend_photos, min(len(recent_friend_photos), 4))
+    recent_friend_photos = random.sample(recent_friend_photos,
+                                         min(len(recent_friend_photos), 4)
+                                         )
 
     return render(request,
                   'imagr_app/stream_page.html',
                   {'recent_self_photos': recent_self_photos,
-                   'recent_friend_photos': recent_friend_photos,
-                   },
-                  )
+                   'recent_friend_photos': recent_friend_photos})
 
 
 @login_required
 def add_photo(request):
+    ''' The add_photo page allows users to add a photo to the site. '''
 
-    invalidation_string = ''
+    context_string = ''
 
     if request.method == 'POST':
 
@@ -323,28 +319,29 @@ def add_photo(request):
                 published=photo_form.cleaned_data['published'],
                 image_url=photo_form.cleaned_data['image_url'])
 
-
             new_photo.save()
 
             return HttpResponseRedirect(reverse('imagr_app:home_page'))
 
         else:
-            invalidation_string = 'Invalid entry. All fields required, image URL must be a valid URL.'
+            context_string = 'Invalid entry. URL must be a valid URL.'
 
     # If a GET (or any other method), create a blank form.
     else:
         photo_form = forms.CreatePhotoForm()
 
     return render(request, 'imagr_app/add_photo.html', {
-        'photo_form': photo_form,
-        'invalidation_string': invalidation_string,
-        })
+                  'photo_form': photo_form,
+                  'context_string': context_string,
+                  })
 
 
 @login_required
 def add_album(request):
+    ''' The add_album page allows users to add an album to the
+    site and associate it with a selection of their photos. '''
 
-    invalidation_string = ''
+    context_string = ''
 
     if request.method == 'POST':
 
@@ -372,19 +369,20 @@ def add_album(request):
                 new_album.photos.add(each_photo)
             new_album.save()
             # The args parameter is how we pass a variable to reverse():
-            return HttpResponseRedirect(reverse('imagr_app:album_page', args=[new_album.id]))
+            return HttpResponseRedirect(reverse('imagr_app:album_page',
+                                                args=[new_album.id]))
 
         else:
-            invalidation_string = 'Invalid entry. All fields required, image URL must be a valid URL.'
+            context_string = 'Invalid entry. All fields required.'
 
     # If a GET (or any other method), create a blank form.
     else:
         album_form = forms.CreateAlbumForm()
 
     return render(request, 'imagr_app/add_album.html', {
-        'album_form': album_form,
-        'invalidation_string': invalidation_string,
-        })
+                  'album_form': album_form,
+                  'context_string': context_string,
+                  })
 
 
 @login_required
@@ -394,37 +392,27 @@ def follow_page(request):
     allows them to follow and unfollow users.'''
 
     # Used when altering forms' querysets below, after form creation:
-    this_user = get_object_or_404(get_user_model(),
-                                          pk=request.user.id)
+    this_user = get_object_or_404(get_user_model(), pk=request.user.id)
 
     context_dictionary = {}
     # context_dictionary['this_user'] = imagr_user_object
     # Listify it for the templating language:
     context_dictionary['list_of_followed_users'] = this_user.following.all()
 
-    users_following_this_user = models.ImagrUser.objects.filter(following=this_user)
-    context_dictionary['users_following_this_user'] = users_following_this_user
+    followers = models.ImagrUser.objects.filter(following=this_user)
+    context_dictionary['followers'] = followers
 
-    invalidation_string = ''
-
-    print("Got this far1")
+    context_string = ''
 
     if request.method == 'POST':
 
-        print("Got this far2")
-
-        this_user_following_form = forms.EditFollowedUsersForm(request.POST)
-        if this_user_following_form.is_valid():
-            # print(str(this_user_following_form.cleaned_data))
-
-            print("Got this far3")
-
-            if this_user_following_form.cleaned_data['following']:
+        follow_form = forms.EditFollowedUsersForm(request.POST)
+        if follow_form.is_valid():
+            following = follow_form.cleaned_data['following']
+            if following:
                 this_user.following.clear()
-                for each_followed_user in this_user_following_form.cleaned_data['following']:
+                for each_followed_user in following:
                     this_user.following.add(each_followed_user)
-
-                print("Got this far4")
 
             this_user.save()
 
@@ -432,46 +420,31 @@ def follow_page(request):
             # after the album has been saved so the album view page
             # (which we redirect to after editing) reflects the
             # newly-edited data.
-            #initial_data_photos_list = this_album.photos.filter(user=request.user.id).exclude(published='private')
-
             initial_data = {'following': this_user.following.all()}
 
-            this_user_following_form = forms.EditFollowedUsersForm(initial_data)
+            follow_form = forms.EditFollowedUsersForm(initial_data)
 
-            context_dictionary['this_user_following_form'] = this_user_following_form
-            invalidation_string = 'Successfully updated your followed users list.'
-            context_dictionary['invalidation_string'] = invalidation_string
-
-            print("Got this far5")
+            context_dictionary['this_user_follow_form'] = follow_form
+            context_string = 'Updated your followed users list.'
+            context_dictionary['context_string'] = context_string
 
             return render(request,
                           'imagr_app/follow_page.html',
                           context_dictionary)
 
         else:
-            invalidation_string = 'Invalid entry, reason unknown.'
+            context_string = 'Invalid entry, reason unknown.'
 
     # If a GET (or any other method), create a blank form.
     # Actually, just hand them a blank form every time.
     # It turns out there's no reason not to.
-    initial_data = {'following': this_user.following.all() }  # initial_data_photos_list}
+    initial_data = {'following': this_user.following.all()}
 
+    follow_form = forms.EditFollowedUsersForm(initial_data)
+    context_dictionary['this_user_follow_form'] = follow_form
 
-    this_user_following_form = forms.EditFollowedUsersForm(initial_data)
-    context_dictionary['this_user_following_form'] = this_user_following_form
-
-    context_dictionary['invalidation_string'] = invalidation_string
+    context_dictionary['context_string'] = context_string
 
     return render(request,
                   'imagr_app/follow_page.html',
                   context_dictionary)
-
-
-
-
-
-
-
-
-
-
