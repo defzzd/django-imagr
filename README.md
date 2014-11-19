@@ -94,6 +94,7 @@ ImagrUser is based off of the standard built-in Django User, with the
 
 Just about everywhere:
     docs.djangoproject.com/
+    The invaluable advice of Dan T. Hable
 
 settings.py:
     stackoverflow.com/questions/21978562
