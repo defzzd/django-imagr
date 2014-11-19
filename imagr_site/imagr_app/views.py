@@ -364,6 +364,39 @@ def add_album(request):
 
 
 @login_required
+def delete_photo(request, photo_id):
+    ''' The delete_photo view allows users to delete photos they own. '''
+
+    this_photo = get_object_or_404(models.Photo,
+                                   pk=photo_id)
+
+    # Note: This check is critically distinct from
+    # what @login_required guarantees us.
+    if request.user.id == this_photo.user_id:
+
+        models.Photo.objects.get(pk=photo_id).delete()
+
+    return HttpResponseRedirect(reverse('imagr_app:home_page'))
+
+
+@login_required
+def delete_album(request, album_id):
+    ''' The delete_album view allows users to delete
+    photos they own without deleting photos. '''
+
+    this_album = get_object_or_404(models.Album,
+                                   pk=album_id)
+
+    # Note: This check is critically distinct from
+    # what @login_required guarantees us.
+    if request.user.id == this_album.user_id:
+
+        models.Album.objects.get(pk=album_id).delete()
+
+    return HttpResponseRedirect(reverse('imagr_app:home_page'))
+
+
+@login_required
 def follow_page(request):
     '''The follow_page shows logged-in users
     a display of users they are following and

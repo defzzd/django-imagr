@@ -30,6 +30,9 @@ In addition to incorporating the django-registration-redux library
     add_album:
         Allows users to add an album to the site and associate it with
         a selection of their photos.
+    delete_photo:
+        Allows users to delete photos they own.
+    delete_album:
     follow_page:
         Shows logged-in users a display of users they are following and
         allows them to follow and unfollow users.

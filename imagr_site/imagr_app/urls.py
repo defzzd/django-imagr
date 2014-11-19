@@ -11,6 +11,8 @@ urlpatterns = patterns('',
     url(r'^stream/$', views.stream_page, name='stream_page'),
     url(r'^add_photo/$', views.add_photo, name='add_photo'),
     url(r'^add_album/$', views.add_album, name='add_album'),
+    url(r'^delete_photo/(?P<photo_id>\d+)/$', views.delete_photo, name='delete_photo'),
+    url(r'^delete_album/(?P<album_id>\d+)/$', views.delete_album, name='delete_album'),
     url(r'^follow/$', views.follow_page, name='follow_page'),
     url(r'^history/$', views.history_page, name='history_page'),
 

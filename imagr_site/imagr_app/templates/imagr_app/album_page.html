@@ -41,11 +41,16 @@
         </form>
 
     {% endif %}
-
+    <br>
+    <form action="{% url 'imagr_app:delete_album' this_album.id %}">
+        {% csrf_token %}
+        <input type="submit" value="Delete Album">
+    </form>
 {% else %}
     <p>Album #{{ this_album.id }} not found.</p>
     <br>
     <br>
+
 
 {% endif %}
 <br>

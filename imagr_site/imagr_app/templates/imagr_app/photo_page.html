@@ -28,6 +28,12 @@
         </form>
 
     {% endif %}
+    <br>
+    <form action="{% url 'imagr_app:delete_photo' this_photo.id %}">
+        {% csrf_token %}
+        <input type="submit" value="Delete Photo">
+    </form>
+
 
 {% else %}
     <p>Photo #{{ this_photo.id }} not found at {{ this_photo.image_url }}.</p>
