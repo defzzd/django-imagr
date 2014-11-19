@@ -24,28 +24,6 @@ def front_page(request):
 
 
 @login_required
-def history_page(request):
-    ''' The user_history view shows logged-in users
-    a chronologically-ordered list of their photos. '''
-
-    imagr_user_object = get_object_or_404(get_user_model(),
-                                          pk=request.user.id)
-
-    # Might be able to alt-cmd-f all copies of this line into request.user.id
-    user_id = imagr_user_object.id
-
-    list_of_photos = models.Photo.objects.filter(
-        user=user_id).order_by('-date_uploaded')[:20]
-    list_of_albums = models.Album.objects.filter(
-        user=user_id).order_by('-date_uploaded')[:20]
-
-    return render(request,
-                  'imagr_app/history_page.html',
-                  {'list_of_photos': list_of_photos,
-                   'list_of_albums': list_of_albums})
-
-
-@login_required
 def home_page(request):
     ''' The home_page shows logged-in users a list of their
     albums, with a representative image from each album. '''
@@ -71,8 +49,8 @@ def home_page(request):
 
 @login_required
 def album_page(request, album_id):
-    '''The album_page shows logged-in users
-    a display of photos in a single album,
+    ''' The album_page shows logged-in users
+    a display of photos in a single album
     and allows logged-in users the ability
     to edit the album's details. '''
 
@@ -180,7 +158,7 @@ def album_page(request, album_id):
 @login_required
 def photo_page(request, photo_id):
     ''' The photo_page shows logged-in users a
-    single photo along with details about it,
+    single photo along with details about it
     and allows logged-in users the ability to
     edit the photo's details. '''
 
@@ -448,3 +426,25 @@ def follow_page(request):
     return render(request,
                   'imagr_app/follow_page.html',
                   context_dictionary)
+
+
+@login_required
+def history_page(request):
+    ''' The history_page shows logged-in users a
+    chronologically-ordered list of their photos. '''
+
+    imagr_user_object = get_object_or_404(get_user_model(),
+                                          pk=request.user.id)
+
+    # Might be able to alt-cmd-f all copies of this line into request.user.id
+    user_id = imagr_user_object.id
+
+    list_of_photos = models.Photo.objects.filter(
+        user=user_id).order_by('-date_uploaded')[:20]
+    list_of_albums = models.Album.objects.filter(
+        user=user_id).order_by('-date_uploaded')[:20]
+
+    return render(request,
+                  'imagr_app/history_page.html',
+                  {'list_of_photos': list_of_photos,
+                   'list_of_albums': list_of_albums})
