@@ -92,8 +92,8 @@ def album_page(request, album_id):
         return HttpResponseRedirect(reverse('imagr_app:front_page'))
 
     # Editing of albums is now done on the album_page itself.
-    invalidation_string = ''
-    context_dictionary['invalidation_string'] = invalidation_string
+    context_string = ''
+    context_dictionary['context_string'] = context_string
 
     if (request.method == 'POST') and (request.user.id == this_album.user_id):
 
@@ -140,15 +140,15 @@ def album_page(request, album_id):
             this_album_edit_form = forms.EditAlbumForm(initial_data)
 
             context_dictionary['this_album_edit_form'] = this_album_edit_form
-            invalidation_string = 'Album successfully updated.'
-            context_dictionary['invalidation_string'] = invalidation_string
+            context_string = 'Album successfully updated.'
+            context_dictionary['context_string'] = context_string
 
             return render(request,
                           'imagr_app/album_page.html',
                           context_dictionary)
 
         else:
-            invalidation_string = 'Invalid entry: all fields required.'
+            context_string = 'Invalid entry: all fields required.'
 
     # If a GET (or any other method), create a blank form.
     # NOTE: This must check for request.user.id == this_photo.user_id, or else
@@ -170,7 +170,7 @@ def album_page(request, album_id):
         this_album_edit_form = forms.EditAlbumForm(initial_data)
 
         context_dictionary['this_album_edit_form'] = this_album_edit_form
-        context_dictionary['invalidation_string'] = invalidation_string
+        context_dictionary['context_string'] = context_string
 
     return render(request,
                   'imagr_app/album_page.html',
@@ -199,8 +199,8 @@ def photo_page(request, photo_id):
         return HttpResponseRedirect(reverse('imagr_app:front_page'))
 
     # Editing of photos is now done on the photo_page itself.
-    invalidation_string = ''
-    context_dictionary['invalidation_string'] = invalidation_string
+    context_string = ''
+    context_dictionary['context_string'] = context_string
 
     if (request.method == 'POST') and (request.user.id == this_photo.user_id):
 
@@ -232,15 +232,15 @@ def photo_page(request, photo_id):
 
             this_photo_edit_form = forms.EditPhotoForm(initial_data)
             context_dictionary['this_photo_edit_form'] = this_photo_edit_form
-            invalidation_string = 'Photo successfully updated.'
-            context_dictionary['invalidation_string'] = invalidation_string
+            context_string = 'Photo successfully updated.'
+            context_dictionary['context_string'] = context_string
 
             return render(request,
                           'imagr_app/photo_page.html',
                           context_dictionary)
 
         else:
-            invalidation_string = 'Error: Image URL must be a valid URL.'
+            context_string = 'Error: Image URL must be a valid URL.'
 
     # If a GET (or any other method), create a blank form.
     # NOTE: This must check for request.user.id == this_photo.user_id, or else
@@ -255,7 +255,7 @@ def photo_page(request, photo_id):
 
         this_photo_edit_form = forms.EditPhotoForm(initial_data)
         context_dictionary['this_photo_edit_form'] = this_photo_edit_form
-        context_dictionary['invalidation_string'] = invalidation_string
+        context_dictionary['context_string'] = context_string
 
     return render(request,
                   'imagr_app/photo_page.html',
@@ -302,7 +302,7 @@ def stream_page(request):
 def add_photo(request):
     ''' The add_photo page allows users to add a photo to the site. '''
 
-    invalidation_string = ''
+    context_string = ''
 
     if request.method == 'POST':
 
@@ -324,7 +324,7 @@ def add_photo(request):
             return HttpResponseRedirect(reverse('imagr_app:home_page'))
 
         else:
-            invalidation_string = 'Invalid entry. URL must be a valid URL.'
+            context_string = 'Invalid entry. URL must be a valid URL.'
 
     # If a GET (or any other method), create a blank form.
     else:
@@ -332,7 +332,7 @@ def add_photo(request):
 
     return render(request, 'imagr_app/add_photo.html', {
                   'photo_form': photo_form,
-                  'invalidation_string': invalidation_string,
+                  'context_string': context_string,
                   })
 
 
@@ -341,7 +341,7 @@ def add_album(request):
     ''' The add_album page allows users to add an album to the
     site and associate it with a selection of their photos. '''
 
-    invalidation_string = ''
+    context_string = ''
 
     if request.method == 'POST':
 
@@ -373,7 +373,7 @@ def add_album(request):
                                                 args=[new_album.id]))
 
         else:
-            invalidation_string = 'Invalid entry. All fields required.'
+            context_string = 'Invalid entry. All fields required.'
 
     # If a GET (or any other method), create a blank form.
     else:
@@ -381,7 +381,7 @@ def add_album(request):
 
     return render(request, 'imagr_app/add_album.html', {
                   'album_form': album_form,
-                  'invalidation_string': invalidation_string,
+                  'context_string': context_string,
                   })
 
 
@@ -402,7 +402,7 @@ def follow_page(request):
     followers = models.ImagrUser.objects.filter(following=this_user)
     context_dictionary['followers'] = followers
 
-    invalidation_string = ''
+    context_string = ''
 
     if request.method == 'POST':
 
@@ -425,15 +425,15 @@ def follow_page(request):
             follow_form = forms.EditFollowedUsersForm(initial_data)
 
             context_dictionary['this_user_follow_form'] = follow_form
-            invalidation_string = 'Updated your followed users list.'
-            context_dictionary['invalidation_string'] = invalidation_string
+            context_string = 'Updated your followed users list.'
+            context_dictionary['context_string'] = context_string
 
             return render(request,
                           'imagr_app/follow_page.html',
                           context_dictionary)
 
         else:
-            invalidation_string = 'Invalid entry, reason unknown.'
+            context_string = 'Invalid entry, reason unknown.'
 
     # If a GET (or any other method), create a blank form.
     # Actually, just hand them a blank form every time.
@@ -443,7 +443,7 @@ def follow_page(request):
     follow_form = forms.EditFollowedUsersForm(initial_data)
     context_dictionary['this_user_follow_form'] = follow_form
 
-    context_dictionary['invalidation_string'] = invalidation_string
+    context_dictionary['context_string'] = context_string
 
     return render(request,
                   'imagr_app/follow_page.html',
