@@ -435,7 +435,7 @@ def follow_page(request):
 
             follow_form = forms.EditFollowedUsersForm(initial_data)
 
-            context_dictionary['this_user_follow_form'] = follow_form
+            context_dictionary['follow_form'] = follow_form
             context_string = 'Updated your followed users list.'
             context_dictionary['context_string'] = context_string
 
@@ -452,10 +452,15 @@ def follow_page(request):
     initial_data = {'following': this_user.following.all()}
 
     follow_form = forms.EditFollowedUsersForm(initial_data)
-    context_dictionary['this_user_follow_form'] = follow_form
+    if follow_form:
+        print "Follow Form Present"
+        print str(follow_form)
+
+    context_dictionary['follow_form'] = follow_form
 
     context_dictionary['context_string'] = context_string
 
+    print "About to render"
     return render(request,
                   'imagr_app/follow_page.html',
                   context_dictionary)
