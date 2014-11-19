@@ -9,7 +9,7 @@ This was produced by Charlie Rode, Ben Friedland, and Charles Gust
 ## Views overview ##
 
 In addition to incorporating the django-registration-redux library
-    for user registration, Imagr has nine custom page views.
+    for user registration, Imagr has eleven custom page views.
 
     front_page:
         Allows users to sign up and log in.
@@ -33,6 +33,7 @@ In addition to incorporating the django-registration-redux library
     delete_photo:
         Allows users to delete photos they own.
     delete_album:
+        Allows users to delete photos they own without deleting photos.
     follow_page:
         Shows logged-in users a display of users they are following and
         allows them to follow and unfollow users.
