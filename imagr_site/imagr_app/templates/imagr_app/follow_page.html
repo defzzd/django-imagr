@@ -13,18 +13,18 @@
     <p>You aren't following any users.</p>
 {% endif %}
 
-{% if invalidation_string %}
-    <h2>{{ invalidation_string }}</h2>
+{% if context_string %}
+    <h2>{{ context_string }}</h2>
     <br>
 {% endif %}
 
-{% if this_user_following_form %}
+{% if follow_form %}
     <br>
     <h3>Edit Your Followed Users List:</h3>
     <br>
     <form method="post" action="">
         {% csrf_token %}
-        {{ this_user_following_form }}
+        {{ follow_form }}
         <br><br>
         <input type="submit" value="Update Your Followed Users List">
     </form>
