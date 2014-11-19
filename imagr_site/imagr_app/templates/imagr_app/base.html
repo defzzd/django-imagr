@@ -1,9 +1,32 @@
-{% extends "admin/base.html" %}
 
-{% block title %}{{ title }} | {{ site_title|default:_('Imagr Admin') }}{% endblock %}
-
+<!DOCTYPE html>
+<html>
+<head>
+<title>{% block title %}{{ site_title|default:_('Imagr, the open photo link sharing site') }}{% endblock %}</title>
 {% block branding %}
-<h1 id="site-name"><a href="{% url 'admin:index' %}">Imagr Administration</a></h1>
+<h1 id="site-name"><a href="{% url 'imagr_app:front_page' %}">Imagr</a></h1>
 {% endblock %}
+User: <strong>{% firstof user.get_short_name user.get_username %}</strong>
+<br>
+{% block nav-global %}
+    <a href="/accounts/login">Log In</a> |
+    <a href="/accounts/logout">Log Out</a> |
+    <a href="{% url 'imagr_app:stream_page' %}">Your Stream</a> |
+    <a href="{% url 'imagr_app:history_page' %}">Your History</a> |
+    <a href="{% url 'imagr_app:add_photo' %}">Add Photo</a> |
+    <a href="{% url 'imagr_app:add_album' %}">Add Album</a> |
+    <a href="{% url 'imagr_app:follow_page' %}">Following</a>
+{% endblock %}
+<hr>
+</head>
+<body>
 
-{% block nav-global %}{% endblock %}
+{% block body %}{% endblock %}
+
+{% comment %}
+Also including a content block so it works smoothly
+    with the default registration templates.
+{% endcomment %}
+{% block content %}{% endblock %}
+</body>
+</html>

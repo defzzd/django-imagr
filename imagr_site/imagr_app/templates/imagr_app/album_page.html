@@ -1,5 +1,6 @@
+{% extends "imagr_app/base.html" %}
+{% block body %}
 <h3>Album Details Page</h3>
-
 
 {% if this_album %}
 
@@ -53,6 +54,4 @@
 
 
 {% endif %}
-<br>
-<br>
-<a href="{% url 'imagr_app:home_page'  %}">Back to Home Page</a>
+{% endblock %}

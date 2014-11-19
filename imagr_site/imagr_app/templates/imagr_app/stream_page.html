@@ -1,4 +1,5 @@
-
+{% extends "imagr_app/base.html" %}
+{% block body %}
 {% if recent_self_photos %}
     <h3>Your Recent Photos:</h3>
     <ul>
@@ -26,5 +27,4 @@
 {% else %}
     <p>Your friends don't have any recent photos.</p>
 {% endif %}
-<br><br>
-<a href="{% url 'imagr_app:home_page'  %}">Back to Home Page</a>
+{% endblock %}

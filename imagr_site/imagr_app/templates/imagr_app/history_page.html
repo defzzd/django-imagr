@@ -1,8 +1,6 @@
-<h1>Home Page</h1>
-<h3><a href="{% url 'imagr_app:add_album' %}">Add Album!</a></h3>
-<h3><a href="{% url 'imagr_app:add_photo' %}">Add Photo!</a></h3>
-<h3><a href="{% url 'imagr_app:stream_page' %}">View Stream!</a></h3>
-<h3><a href="{% url 'imagr_app:home_page' %}">Return Home</a></h3>
+{% extends "imagr_app/base.html" %}
+{% block body %}
+<h1>History Page</h1>
 
 {% if list_of_albums %}
     <ul>
@@ -38,4 +36,7 @@
     </ul>
 {% else %}
     <p>You haven't submitted any photos yet.</p>
+
 {% endif %}
+
+{% endblock %}

@@ -1,5 +1,6 @@
+{% extends "imagr_app/base.html" %}
+{% block body %}
 <h3>Your Followed Users Page</h3>
-
 
 {% if list_of_followed_users %}
     <h3>Your Followed Users:</h3>
@@ -42,8 +43,4 @@
 {% else %}
     <p>You don't have any followers yet.</p>
 {% endif %}
-
-<br>
-<a href="{% url 'imagr_app:stream_page'  %}">See Your Stream Page</a>
-<br>
-<a href="{% url 'imagr_app:home_page'  %}">Back to Home Page</a>
+{% endblock %}
