@@ -1,3 +1,5 @@
+{% extends "imagr_app/base.html" %}
+{% block body %}
 <h3>Photo Details Page</h3>
 
 {% if this_photo %}
@@ -28,12 +30,14 @@
         </form>
 
     {% endif %}
+    <br>
+    <form action="{% url 'imagr_app:delete_photo' this_photo.id %}">
+        {% csrf_token %}
+        <input type="submit" value="Delete Photo">
+    </form>
+
 
 {% else %}
     <p>Photo #{{ this_photo.id }} not found at {{ this_photo.image_url }}.</p>
-<br>
-<br>
 {% endif %}
-<br>
-<br>
-<a href="{% url 'imagr_app:home_page' %}">Return Home</a>
+{% endblock %}

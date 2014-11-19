@@ -1,7 +1,9 @@
-
-
+{% extends "imagr_app/base.html" %}
+{% block body %}
 <h1>Make new album</h1>
-<h3>Missing or invalid entries will helpfully reset the form.</h3><br>
+
+<h3>Missing or invalid entries will helpfully reset the form.</h3>
+<br>
 
 {{ context_string }}
 
@@ -14,4 +16,4 @@
 
 
 <br>
-<a href="{% url 'imagr_app:home_page'  %}">Back to Home Page</a>
+{% endblock %}

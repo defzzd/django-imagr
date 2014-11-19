@@ -2,7 +2,43 @@
 ============
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/CharlesGust/django-imagr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+
 This was produced by Charlie Rode, Ben Friedland, and Charles Gust
+
+
+## Views overview ##
+
+In addition to incorporating the django-registration-redux library
+    for user registration, Imagr has eleven custom page views.
+
+    front_page:
+        Allows users to sign up and log in.
+    home_page:
+        Shows logged-in users a list of their albums, with a representative
+        image from each album.
+    album_page:
+        Shows logged-in users a display of photos in a single album and
+        allows logged-in users the ability to edit the album's details.
+    photo_page:
+        Shows logged-in users a single photo along with details about it
+        and allows logged-in users the ability to edit the photo's details.
+    stream_page:
+        Shows users their most recent photos along with recent photos
+        uploaded by those they are following.
+    add_photo:
+        Allows users to add a photo to the site.
+    add_album:
+        Allows users to add an album to the site and associate it with
+        a selection of their photos.
+    delete_photo:
+        Allows users to delete photos they own.
+    delete_album:
+        Allows users to delete photos they own without deleting photos.
+    follow_page:
+        Shows logged-in users a display of users they are following and
+        allows them to follow and unfollow users.
+    history_page:
+        Shows logged-in users a chronologically-ordered list of their photos.
 
 
 ## Commands to set up the database ##
@@ -28,6 +64,8 @@ postgres=# \q
 6. Migrate the database using Django's manage.py utility:
 python manage.py migrate
 
+
+## Description of the database model ##
 
 Photo contains an image and meta-data associated with that image.
 
@@ -61,5 +99,15 @@ ImagrUser is based off of the standard built-in Django User, with the
         disabling an account.
 
 
+## References used ##
 
+Just about everywhere:
+    docs.djangoproject.com
+    The invaluable advice of Dan T. Hable
 
+settings.py:
+    stackoverflow.com/questions/21978562
+
+admin.py:
+    stackoverflow.com/questions/11754877
+    stackoverflow.com/questions/2156114

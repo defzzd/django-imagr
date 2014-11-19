@@ -1,5 +1,6 @@
+{% extends "imagr_app/base.html" %}
+{% block body %}
 <h3>Album Details Page</h3>
-
 
 {% if this_album %}
 
@@ -41,13 +42,16 @@
         </form>
 
     {% endif %}
-
+    <br>
+    <form action="{% url 'imagr_app:delete_album' this_album.id %}">
+        {% csrf_token %}
+        <input type="submit" value="Delete Album">
+    </form>
 {% else %}
     <p>Album #{{ this_album.id }} not found.</p>
     <br>
     <br>
 
+
 {% endif %}
-<br>
-<br>
-<a href="{% url 'imagr_app:home_page'  %}">Back to Home Page</a>
+{% endblock %}
