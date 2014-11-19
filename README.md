@@ -4,6 +4,8 @@
 
 This was produced by Charlie Rode, Ben Friedland, and Charles Gust
 
+## Views overview ##
+
 In addition to incorporating the django-registration-redux library
     for user registration, Imagr has nine custom page views.
 
@@ -55,6 +57,7 @@ postgres=# \q
 6. Migrate the database using Django's manage.py utility:
 python manage.py migrate
 
+## Description of the database model ##
 
 Photo contains an image and meta-data associated with that image.
 
@@ -87,7 +90,17 @@ ImagrUser is based off of the standard built-in Django User, with the
     Users have a 'date_joined' field and an 'active' field that allows
         disabling an account.
 
+## References used ##
 
+Just about everywhere:
+    docs.djangoproject.com/
+
+settings.py:
+    stackoverflow.com/questions/21978562
+
+admin.py:
+    stackoverflow.com/questions/11754877
+    stackoverflow.com/questions/2156114
 
 
 
