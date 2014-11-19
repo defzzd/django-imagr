@@ -2,7 +2,9 @@
 ============
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/CharlesGust/django-imagr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+
 This was produced by Charlie Rode, Ben Friedland, and Charles Gust
+
 
 ## Views overview ##
 
@@ -34,6 +36,7 @@ In addition to incorporating the django-registration-redux library
     history_page:
         Shows logged-in users a chronologically-ordered list of their photos.
 
+
 ## Commands to set up the database ##
 
 1. Enter PSQL with this command:
@@ -56,6 +59,7 @@ postgres=# \q
 
 6. Migrate the database using Django's manage.py utility:
 python manage.py migrate
+
 
 ## Description of the database model ##
 
@@ -90,10 +94,11 @@ ImagrUser is based off of the standard built-in Django User, with the
     Users have a 'date_joined' field and an 'active' field that allows
         disabling an account.
 
+
 ## References used ##
 
 Just about everywhere:
-    docs.djangoproject.com/
+    docs.djangoproject.com
     The invaluable advice of Dan T. Hable
 
 settings.py:
@@ -102,6 +107,3 @@ settings.py:
 admin.py:
     stackoverflow.com/questions/11754877
     stackoverflow.com/questions/2156114
-
-
-
