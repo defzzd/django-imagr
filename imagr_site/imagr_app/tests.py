@@ -62,6 +62,43 @@ class testImagrTransactionTestCase(TransactionTestCase):
         self.assertEqual(response.status_code, 404)
 
 
+        response = self.client.get('/accounts/login/')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/imagr_app/')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/imagr_app/album/1/')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/imagr_app/stream/')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/imagr_app/add_photo/')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/imagr_app/add_album/')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/imagr_app/follow/')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/imagr_app/history/')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/imagr_app/photo/4/')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/imagr_app/photo/5/')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/imagr_app/delete_photo/4')
+        self.assertEqual(response.status_code, 301)
+
+        response = self.client.get('/imagr_app/delete_album/1/')
+        self.assertEqual(response.status_code, 302)
+
+
 # SimpleTestCase's need:
 #  from django.test import SimpleTestCase
 
@@ -76,11 +113,42 @@ class testImagrSimpleTestCase(SimpleTestCase):
 
     def test_accessURLS(self):
 
+        # not logged into any account
         response = self.client.get('/accounts/login/')
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get('/imagr_app/')
         self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/imagr_app/album/1')
+        self.assertEqual(response.status_code, 301)
+
+        response = self.client.get('/imagr_app/stream/')
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.get('/imagr_app/add_photo/')
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.get('/imagr_app/add_album/')
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.get('/imagr_app/follow/')
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.get('/imagr_app/history/')
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.get('/imagr_app/photo/1')
+        self.assertEqual(response.status_code, 301)
+
+        response = self.client.get('/imagr_app/photo/8/')
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.get('/imagr_app/delete_photo/1')
+        self.assertEqual(response.status_code, 301)
+
+        response = self.client.get('/imagr_app/delete_album/1')
+        self.assertEqual(response.status_code, 301)
 
 
 # These test cases should be simple enough to require no Django
