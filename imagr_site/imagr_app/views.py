@@ -38,8 +38,7 @@ def home_page(request):
                                           pk=request.user.id)
 
     user_id = imagr_user_object.id
-    list_of_albums = get_list_or_404(models.Album,
-                                     user=user_id)
+    list_of_albums = models.Album.objects.filter(user=user_id)
 
     return render(request,
                   'imagr_app/home_page.html',
@@ -408,7 +407,7 @@ def follow_page(request):
     context_dictionary = {}
     # context_dictionary['this_user'] = imagr_user_object
     # Listify it for the templating language:
-    context_dictionary['list_of_followed_users'] = this_user.following.all()
+    context_dictionary['following'] = this_user.following.all()
 
     followers = models.ImagrUser.objects.filter(following=this_user)
     context_dictionary['followers'] = followers
