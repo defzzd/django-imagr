@@ -59,6 +59,19 @@ def album_page(request, album_id):
     context_dictionary = {}
     context_dictionary['this_album'] = this_album
 
+    # The following line returns the album owner's
+    # ID only if this_user is following them:
+    owners_of_this_album = this_user.following.filter(pk=this_album.user_id)
+    if owners_of_this_album:
+        # There is only ever one owner of a given album ID, but because
+        # a filter is needed to return it from following, it comes in a list.
+        album_owner_id = owners_of_this_album[0].id
+    else:
+        # If owners_of_this_album did not exist, it means this_user is not
+        # following whoever owns this album.
+        # -1 is used to falsify the conditional.
+        album_owner_id = -1
+
     # NOTE: The final possible condition, the 'shared' one, checks to see
     # if the user who owns this album has shared it and the user who is looking
     # at the album is following the user who owns the album.
@@ -67,8 +80,7 @@ def album_page(request, album_id):
     if ((this_album.published == 'public')
         or (this_album.user_id == request.user.id)
             or ((this_album.published == 'shared')
-                and (this_user.following.filter(pk=this_album.user_id)[0].id
-                     == this_album.user_id))):
+                and (album_owner_id == this_album.user_id))):
 
         context_dictionary['list_of_photos'] = this_album.photos.all()
 
@@ -174,6 +186,20 @@ def photo_page(request, photo_id):
 
     context_dictionary = {}
 
+    # The following line returns the photo owner's
+    # ID only if this_user is following them:
+    owners_of_this_photo = this_user.following.filter(pk=this_photo.user_id)
+    print owners_of_this_photo
+    if owners_of_this_photo:
+        # There is only ever one owner of a given photo ID, but because
+        # a filter is needed to return it from following, it comes in a list.
+        photo_owner_id = owners_of_this_photo[0].id
+    else:
+        # If owners_of_this_photo did not exist, it means this_user is not
+        # following whoever owns this photo.
+        # -1 is used to falsify the conditional.
+        photo_owner_id = -1
+
     # NOTE: The final possible condition, the 'shared' one, checks to see
     # if the user who owns this photo has shared it and the user who is looking
     # at the photo is following the user who owns the photo.
@@ -182,8 +208,7 @@ def photo_page(request, photo_id):
     if ((this_photo.published == 'public')
         or (this_photo.user_id == request.user.id)
             or ((this_photo.published == 'shared')
-                and (this_user.following.filter(pk=this_photo.user_id)[0].id
-                     == this_photo.user_id))):
+                and (photo_owner_id == this_photo.user_id))):
 
         context_dictionary['this_photo'] = this_photo
 
