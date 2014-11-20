@@ -2,10 +2,10 @@
 {% block body %}
 <h3>Your Followed Users Page</h3>
 
-{% if list_of_followed_users %}
+{% if following %}
     <h3>Your Followed Users:</h3>
     <ul>
-    {% for each_user in list_of_followed_users %}
+    {% for each_user in following %}
         {{ each_user.username }}
         <br>
     {% endfor %}
@@ -32,10 +32,10 @@
 
 {% endif %}
 
-{% if users_following_this_user %}
+{% if followers %}
     <h3>Your Followers:</h3>
     <ul>
-    {% for each_follower in users_following_this_user %}
+    {% for each_follower in followers %}
         {{ each_follower.username }}
         <br>
     {% endfor %}
