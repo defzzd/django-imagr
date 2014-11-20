@@ -53,14 +53,22 @@ def album_page(request, album_id):
     and allows logged-in users the ability
     to edit the album's details. '''
 
-    this_album = get_object_or_404(models.Album,
-                                   pk=album_id)
+    this_album = get_object_or_404(models.Album, pk=album_id)
+    this_user = get_object_or_404(get_user_model(), pk=request.user.id)
 
     context_dictionary = {}
     context_dictionary['this_album'] = this_album
 
-    if ((this_album.published == 'public') or
-       (this_album.user_id == request.user.id)):
+    # NOTE: The final possible condition, the 'shared' one, checks to see
+    # if the user who owns this album has shared it and the user who is looking
+    # at the album is following the user who owns the album.
+    # This is like checking to see if you're following someone on Twitter,
+    # except if you aren't electing to follow them, you can't see their stuff.
+    if ((this_album.published == 'public')
+        or (this_album.user_id == request.user.id)
+            or ((this_album.published == 'shared')
+                and (this_user.following.filter(pk=this_album.user_id)[0].id
+                     == this_album.user_id))):
 
         context_dictionary['list_of_photos'] = this_album.photos.all()
 
@@ -161,13 +169,21 @@ def photo_page(request, photo_id):
     and allows logged-in users the ability to
     edit the photo's details. '''
 
-    this_photo = get_object_or_404(models.Photo,
-                                   pk=photo_id)
+    this_photo = get_object_or_404(models.Photo, pk=photo_id)
+    this_user = get_object_or_404(get_user_model(), pk=request.user.id)
 
     context_dictionary = {}
 
+    # NOTE: The final possible condition, the 'shared' one, checks to see
+    # if the user who owns this photo has shared it and the user who is looking
+    # at the photo is following the user who owns the photo.
+    # This is like checking to see if you're following someone on Twitter,
+    # except if you aren't electing to follow them, you can't see their stuff.
     if ((this_photo.published == 'public')
-       or (this_photo.user_id == request.user.id)):
+        or (this_photo.user_id == request.user.id)
+            or ((this_photo.published == 'shared')
+                and (this_user.following.filter(pk=this_photo.user_id)[0].id
+                     == this_photo.user_id))):
 
         context_dictionary['this_photo'] = this_photo
 
