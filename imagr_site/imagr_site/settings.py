@@ -108,3 +108,33 @@ AUTH_USER_MODEL = 'imagr_app.ImagrUser'
 
 ACCOUNT_ACTIVATION_DAYS = 60
 
+import deployment
+deployment.setup_deployment()
+
+# To invoke the deployment settings, "deploy" must be used when running
+#  the application
+if 'deploy' in sys.argv:
+    # SECURITY WARNING: don't run with debug turned on in production!
+    DEBUG = os,environ['DEBUG']
+
+    ALLOWED_HOSTS = os.environ['ALLOWED_HOSTS']
+
+    STATIC_ROOT = os.environ['STATIC_ROOT']
+
+    MEDIA_ROOT = os.environ['MEDIA_ROOT']
+
+    # There is a risk that the greater security of setting
+    #  these to True will not work unless we get an SSL
+    #  certificate, and we don't know yet whether Amazon EC2
+    #  will give us a certificate or let us use one of theirs
+
+    CSRF_COOKIE_SECURE = os.environ['CSRF_COOKIE_SECURE']
+
+    SESSION_COOKIE_SECURE = os.environ['SESSION_COOKIE_SECURE']
+
+    # Performance Optimizations
+
+    CONN_MAX_AGE = os.environ['CONN_MAX_AGE']
+    # TEMPLATE_LOADERS =
+
+    # Error reporting
