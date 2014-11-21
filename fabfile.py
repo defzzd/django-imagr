@@ -92,13 +92,14 @@ def provision_instance(wait_for_running=False, timeout=60, interval=2):
         while new_instances and (time_waited < timeout_value):
             time.sleep(wait_value)
             time_waited += int(wait_value)
-            for each_instance in new_instaces:
+            for each_instance in new_instances:  # range!
                 current_state = each_instance.state
                 print("Instance {} is currently {}".format(each_instance.id,
                                                            current_state))
                 if current_state == "running":
+                    # NOTE: This part does not work for circumstances where len(new_instances) > 1, but that's okay, because this is provision_instance, not provision_instances(). It's very unpythonic though and must be changed when I have more time.
                     running_instance.append(
-                        new_instances.pop(new_instances.index(i)))  # !
+                        new_instances.pop(new_instances.index(each_instance)))  # !
                 each_instance.update()
 
 # Example use of above function:
@@ -236,6 +237,7 @@ def run_command_on_selected_server(command):
 # this command on your remote server, it means you have some work to do."
 
 
+# ((Do this first maybe? Review))
 # "In order to run a command on this server, you need to ensure that
 # the keypair you set up for your AWS instances is available to the ssh agent.
 # You can do that at the system level on your local machine:
@@ -324,3 +326,36 @@ def terminate_stopped_instance():
     ec2_connection = get_ec2_connection()
 
     ec2_connection.terminate_instances(instance_ids=[env.active_instance.id])
+
+
+
+
+
+
+def _install_requirements():
+
+
+
+
+# An internal command that should be wrapped for fab:
+def _install_nginx():
+    sudo('apt-get install nginx')
+    # This command runs nginx with the start arg:
+    sudo('/etc/init.d/nginx start')
+
+
+# "Finally, we need to wrap this function in a function we might call
+# from the command line that will run it on the server we select:""
+def install_nginx():
+    run_command_on_selected_server(_install_nginx)
+
+
+
+
+
+
+
+
+
+
+
