@@ -2,11 +2,9 @@ import os
 
 def setup_deployment():
     # SECURITY WARNING: don't run with debug turned on in production!
-    os,environ['DEBUG'] = False
+    os.environ['DEBUG'] = "False"
 
-    os.environ['ALLOWED_HOSTS'] = [
-        "imagr_app.charlesgust.me",
-    ]
+    os.environ['ALLOWED_HOSTS'] = "['imagr_app.charlesgust.me',]"
 
     os.environ['STATIC_ROOT'] = "/var/imagr_app/charlesgust.me/static/"
 
@@ -17,9 +15,9 @@ def setup_deployment():
     #  certificate, and we don't know yet whether Amazon EC2
     #  will give us a certificate or let us use one of theirs
 
-    os.environ['CSRF_COOKIE_SECURE'] = True
+    os.environ['CSRF_COOKIE_SECURE'] = "True"
 
-    os.environ['SESSION_COOKIE_SECURE'] = True
+    os.environ['SESSION_COOKIE_SECURE'] = "True"
 
     # Performance Optimizations
 
