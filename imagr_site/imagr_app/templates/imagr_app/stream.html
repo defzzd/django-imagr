@@ -4,7 +4,7 @@
     {% for photo in user_photos %}
         <br>
         <a href="{% url 'imagr_app:photo_page' photo.id %}">{{ photo.title }}</a><br>
-        <img src="../../static/{{ photo.photo_data }}" width="150" height="100">
+        <img class="photo" src="{{ photo.url }}" width="150" height="100">
     {% endfor %}
     </ul>
 {% else %}
@@ -19,3 +19,4 @@
     <br><br>
     {% endfor %}
 {% endif %}
+<a href="{% url 'imagr_app:front_page' %}">Home</a>

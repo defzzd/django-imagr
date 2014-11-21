@@ -4,10 +4,18 @@
     {% for album in user_albums %}
         <a href="{% url 'imagr_app:album_page' album.id %}">{{ album.title }}</a>
         <br>
-        <img src="../../static/{{ album.cover.photo_data }}" width="150" height="100">
+        <img class="photo" src="{{ album.cover.url }}" width="150" height="100">
         <br><br>
     {% endfor %}
     </ul>
 {% else %}
-    <p>This user has no albums</p>
+    <p>You have no albums</p>
 {% endif %}
+
+<a href="{% url 'imagr_app:submit_photo' %}">Upload Photo</a>
+<br><br>
+<a href="{% url 'imagr_app:create_album' %}">Create Album</a>
+<br><br>
+<a href="{% url 'imagr_app:followers' %}">Manage Friends</a>
+<br><br>
+<a href="{% url 'imagr_app:stream' %}">Stream Page</a>

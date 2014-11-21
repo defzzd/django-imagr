@@ -1,7 +1,7 @@
 <h1>Edit Photo</h1>
 {% if photo_form %}
 <h2>{{ photo.title }}</h2>
-<img src="../../static/{{ photo.photo_data }}" width="450" height="300">
+<img class="photo" src="{{ photo.url }}" width="450" height="300">
 <form method="post", action="">
     {% csrf_token %}
     {{ photo_form }}
@@ -12,4 +12,4 @@
     <p>Could not find the specified photo</p>
 {% endif %}
 <br><br>
-<a href="{% url 'imagr_app:front_page' %}">Back to HomePage</a>
+<a href="{% url 'imagr_app:front_page' %}">Home</a>
