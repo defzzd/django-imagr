@@ -19,10 +19,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '8#o%qk@i&hk=3u3xs)sn_7_!tr5b+f_heai1875_9qk5$2r!ti'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+
+#AWS
+ACCESS_KEY_ID = os.getenv('ACCESS_KEY_ID')
+SECRET_ACCESS_KEY = os.getenv('SECRET_ACCESS_KEY')
 
 TEMPLATE_DEBUG = True
 
@@ -80,8 +84,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'imagr',
         'USER': 'imagr',
-        'PASSWORD': 'imagr',
-        'HOST': 'localhost',
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': 'localhostw',
     }
 }
 
