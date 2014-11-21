@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 #AWS
 ACCESS_KEY_ID = os.getenv('ACCESS_KEY_ID')
@@ -85,7 +85,7 @@ DATABASES = {
         'NAME': 'imagr',
         'USER': 'imagr',
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'localhostw',
+        'HOST': 'localhost',
     }
 }
 

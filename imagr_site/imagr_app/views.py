@@ -9,6 +9,9 @@ from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from forms import AlbumForm, PhotoForm, EditPhotoForm, FollowForm
 import datetime
+# NEW STUFF STARTING HERE
+from django.conf import settings
+
 
 
 def front_page(request):
