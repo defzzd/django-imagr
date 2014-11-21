@@ -39,8 +39,8 @@ class Photo(models.Model):
     published = models.CharField(max_length=7,
                                 choices=PUBLISHED_CHOICES,
                                 default="private")
-    #photo_url = models.CharField(max_length=150)
-    photo_data = models.FileField(blank=True, max_length=150)
+    url = models.CharField(null=True, max_length=150)
+    photo_data = models.FileField(null=True, blank=True, max_length=150)
 
     def __unicode__(self):
         return self.title
