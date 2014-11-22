@@ -10,15 +10,17 @@ env.hosts = ['*',]
 env['user'] = 'ubuntu'
 # Getting a connection to us-west-2:
 env['aws_region'] = 'us-west-2'
+
+# This inserts the credentials into the OS environment.
 execfile("./imagr_site/imagr_site/credentials.py")
 
 
 
 
 
-def install_pips():
+def _install_pips():
     sudo("pip install -r requirements.txt")
-    pass
+    # pass
 
 # also, we need to sudo and bind on Ubuntu to get access to low number ports
 # sudo(".....b0000")
@@ -28,7 +30,7 @@ def install_pips():
 
 # we will need this string to invoke gunicorn
 
-def runserver():
+def _runserver():
     sudo("/etc/init.d/nginx restart")
     with cd("django-imagr/imagr_site"):
         sudo("python manage.py migrate")
@@ -79,7 +81,7 @@ def provision_instance(wait_for_running=False, timeout=60, interval=2):
     #       cost you money if you aren't careful.
     instance_type = 't1.micro'
     # This one is in your ~/.ssh dir:
-    key_name = '20141105'  # probably?? maybe not? ctrl-f tutorial's use of 'pk-'
+    key_name = 'pk-aws'  # 20141105 for cmg
     security_group = 'ssh-access'
     ami_id = 'ami-37501207'
 
@@ -237,7 +239,7 @@ def run_command_on_selected_server(command, askforchoice=True):
 
 def restart_server():
     sudo("shutdown -r now")
-    time.sleep(60)
+    #time.sleep(60)
 
 # "Remember, you cannot use password authentication to log into AWS servers.
 # If you find that you are prompted to enter a password in order to run
@@ -258,12 +260,18 @@ def restart_server():
 
 def _setup_imagr_aptgets():
     # check for any system updates
+    # For some reason, there must be a pause before apt-getting anything,
+    # or else even a status=='running' server will time out the request.
+    time.sleep(60)
     sudo("apt-get -y update")
-
+    #time.sleep(60)
     # check for any system upgrades
     sudo("apt-get -y upgrade")
 
+    # Attempting to fix "ImportError: cannot import name IncompleteRead"
+    #sudo("pip install -U pip")
     sudo("apt-get -y install python-pip")
+
     sudo("apt-get -y install python-dev")
     sudo("apt-get -y install postgresql-9.3")
     sudo("apt-get -y install postgresql-server-dev-9.3")
@@ -373,19 +381,100 @@ def terminate_stopped_instance(askforchoice=True):
     ec2_connection.terminate_instances(instance_ids=[env.active_instance.id])
 
 
+
+
+
 def run_custom_command(command):
     select_instance(askforchoice=False)
     sudo(command)
 
+
+
+
+# The following comes mostly from miracode again. Reference:
+# https://github.com/miracode/django-imagr/blob/master/fabfile.py
 def _setup_database():
-    pass
+    password = os.environ['DATABASE_PASSWORD']
 
+    sudo('createdb imagr', user='postgres')
 
+    create_user_sql_query = """"
+    CREATE USER imagr WITH password '%s';
+    GRANT ALL ON DATABASE imagr TO imagr;"
+    """ % password
 
+    sudo('psql -U postgres imagr -c %s' % create_user_sql_query, user='postgres')
+
+# These need run_command_on_selected_server() to run on them, so set
+# askforchoice=False
 def run_complete_setup():
     provision_instance(wait_for_running=True)
-    _setup_imagr_aptgets()
-    _move_sources()
-    install_pips()
-    _setup_database()
-    runserver()
+    run_command_on_selected_server(_setup_imagr_aptgets, askforchoice=False)
+    run_command_on_selected_server(_move_sources, askforchoice=False)
+    run_command_on_selected_server(_install_pips, askforchoice=False)
+    run_command_on_selected_server(_setup_database, askforchoice=False)
+    run_command_on_selected_server(_runserver, askforchoice=False)
+
+
+
+
+
+
+
+
+# setup_incomplete_server and finish_incomplete_server, along with the
+# split function *incomplete_imagr_aptgets, exist because running
+# apt-get
+
+def setup_incomplete_server():
+    provision_instance(wait_for_running=True)
+    run_command_on_selected_server(_setup_incomplete_imagr_aptgets, askforchoice=False)
+
+def finish_incomplete_server_setup():
+    run_command_on_selected_server(_finish_incomplete_imagr_aptgets)
+    run_command_on_selected_server(_move_sources)
+    run_command_on_selected_server(_install_pips)
+
+
+# provision_instance
+#    get_ec2_connection
+# _setup_imagr_aptgets
+# _move_sources
+# _install_pips
+# _setup_database
+# runserver()
+
+
+def _setup_incomplete_imagr_aptgets():
+    # For some reason, there must be a pause before apt-getting anything,
+    # or else even a status=='running' server will time out the request.
+
+
+    # check for any system updates
+    time.sleep(60)
+    sudo("apt-get -y update")
+    #time.sleep(60)
+    # check for any system upgrades
+    sudo("apt-get -y upgrade")
+
+def _finish_incomplete_imagr_aptgets():
+
+    # Attempting to fix "ImportError: cannot import name IncompleteRead"
+    #sudo("pip install -U pip")
+    sudo("apt-get -y install python-pip")
+
+    sudo("apt-get -y install python-dev")
+    sudo("apt-get -y install postgresql-9.3")
+    sudo("apt-get -y install postgresql-server-dev-9.3")
+    sudo("apt-get -y install git")
+    sudo("apt-get -y install gunicorn")
+    sudo("apt-get -y install nginx")
+
+    # if any updates were performed above, we probably have to reboot server
+
+    sudo("/etc/init.d/nginx start")
+    restart_server()
+
+
+
+
