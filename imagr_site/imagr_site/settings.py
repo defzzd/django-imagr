@@ -73,7 +73,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'imagr',
         'USER': 'imagr',
-        'PASSWORD': 'imagr',
+        'PASSWORD': os.environ['DATABASE_PASSWORD'],
         'HOST': 'localhost',
     }
 }
@@ -119,7 +119,7 @@ MEDIA_ROOT = "media/"
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['imagr.charlesgust.me',]
+ALLOWED_HOSTS = ['*',]
 
     # There is a risk that the greater security of setting
     #  these to True will not work unless we get an SSL

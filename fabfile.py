@@ -10,7 +10,7 @@ env.hosts = ['*',]
 env['user'] = 'ubuntu'
 # Getting a connection to us-west-2:
 env['aws_region'] = 'us-west-2'
-
+execfile("./imagr_site/imagr_site/credentials.py")
 
 
 
@@ -29,7 +29,12 @@ def install_pips():
 # we will need this string to invoke gunicorn
 
 def runserver():
-    run('gunicorn imagr_site.wsgi:imagr_app')
+    sudo("/etc/init.d/nginx restart")
+    with cd("django-imagr/imagr_site"):
+        sudo("python manage.py migrate")
+        sudo("python manage.py collectstatic")
+        # CMGTODO: maybe "run" below to avoid overprivileging the app
+        sudo('gunicorn -b 127.0.0.1:8888 imagr_site.wsgi:application')
 
 
 
@@ -229,6 +234,11 @@ def run_command_on_selected_server(command, askforchoice=True):
     # Execute the command:
     execute(command, hosts=selected_hosts)
 
+
+def restart_server():
+    sudo("shutdown -r now")
+    time.sleep(60)
+
 # "Remember, you cannot use password authentication to log into AWS servers.
 # If you find that you are prompted to enter a password in order to run
 # this command on your remote server, it means you have some work to do."
@@ -259,9 +269,13 @@ def _setup_imagr_aptgets():
     sudo("apt-get -y install postgresql-server-dev-9.3")
     sudo("apt-get -y install git")
     sudo("apt-get -y install gunicorn")
+    sudo("apt-get -y install nginx")
 
     # if any updates were performed above, we probably have to reboot server
-    sudo("shutdown -r now")
+
+    sudo("/etc/init.d/nginx start")
+    restart_server()
+
 
 
 def setup_imagr_aptgets():
@@ -273,6 +287,8 @@ def _move_sources():
     # We don't want to git clone if we already have this directory
     #  set up on the machine.
     run("git clone https://github.com/CharlesGust/django-imagr.git")
+    sudo("ln -s /home/ubuntu/django-imagr/nginx.conf /etc/nginx/sites-enabled/amazonaws.com")
+
     with cd("django-imagr"):
         sudo("pip install -r requirements.txt")
         put("imagr_site/imagr_site/credentials.py",
@@ -361,6 +377,9 @@ def run_custom_command(command):
     select_instance(askforchoice=False)
     sudo(command)
 
+def _setup_database():
+    pass
+
 
 
 def run_complete_setup():
@@ -368,4 +387,5 @@ def run_complete_setup():
     _setup_imagr_aptgets()
     _move_sources()
     install_pips()
+    _setup_database()
     runserver()
