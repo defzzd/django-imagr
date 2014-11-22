@@ -6,10 +6,6 @@ def setup_deployment():
 
     os.environ['ALLOWED_HOSTS'] = "['imagr_app.charlesgust.me',]"
 
-    os.environ['STATIC_ROOT'] = "/var/imagr_app/charlesgust.me/static/"
-
-    os.environ['MEDIA_ROOT'] = "/var/imagr_app/charlesgust.me/media/"
-
     # There is a risk that the greater security of setting
     #  these to True will not work unless we get an SSL
     #  certificate, and we don't know yet whether Amazon EC2
@@ -21,7 +17,7 @@ def setup_deployment():
 
     # Performance Optimizations
 
-    os.environ['CONN_MAX_AGE'] = 60
+    os.environ['CONN_MAX_AGE'] = "60"
     # TEMPLATE_LOADERS =
 
     # Error reporting
