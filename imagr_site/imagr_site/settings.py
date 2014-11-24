@@ -25,12 +25,25 @@ EMAIL_PORT = 25
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ['SECRET_KEY']
 
+
+import deployment
+deployment.setup_deployment()
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ['DEBUG']
 
-TEMPLATE_DEBUG = True
+TEMPLATE_DEBUG = os.environ['TEMPLATE_DEBUG']
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ['ALLOWED_HOSTS']
+
+# CSRF cookie settings defaults should be permissible for this demonstration,
+# because we don't need to handle a certificate yet.
+# In reality we'd want to use a certificate and set them to True
+# via the deployment file.
+# CSRF_COOKIE_SECURE = os.environ['CSRF_COOKIE_SECURE']
+# SESSION_COOKIE_SECURE = os.environ['SESSION_COOKIE_SECURE']
+
+CONN_MAX_AGE = os.environ['CONN_MAX_AGE']
+
 
 
 # Application definition
@@ -73,7 +86,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'imagr',
         'USER': 'imagr',
-        'PASSWORD': 'imagr',
+        'PASSWORD': os.environ['DATABASE_PASSWORD'],
         'HOST': 'localhost',
     }
 }
@@ -108,33 +121,27 @@ AUTH_USER_MODEL = 'imagr_app.ImagrUser'
 
 ACCOUNT_ACTIVATION_DAYS = 60
 
-import deployment
-deployment.setup_deployment()
 
-# To invoke the deployment settings, "deploy" must be used when running
-#  the application
-if 'deploy' in sys.argv:
-    # SECURITY WARNING: don't run with debug turned on in production!
-    DEBUG = os,environ['DEBUG']
 
-    ALLOWED_HOSTS = os.environ['ALLOWED_HOSTS']
+# These variables are set this way for deployment (overwriting values
+#  set above (like DEBUG="True")
 
-    STATIC_ROOT = os.environ['STATIC_ROOT']
+STATIC_ROOT = "static/"
 
-    MEDIA_ROOT = os.environ['MEDIA_ROOT']
+MEDIA_ROOT = "media/"
+
+#DEBUG = False
+
+ALLOWED_HOSTS = ['*',]
 
     # There is a risk that the greater security of setting
     #  these to True will not work unless we get an SSL
     #  certificate, and we don't know yet whether Amazon EC2
     #  will give us a certificate or let us use one of theirs
 
-    CSRF_COOKIE_SECURE = os.environ['CSRF_COOKIE_SECURE']
+# CSRF_COOKIE_SECURE = "True"
 
-    SESSION_COOKIE_SECURE = os.environ['SESSION_COOKIE_SECURE']
+# SESSION_COOKIE_SECURE = "True"
 
     # Performance Optimizations
 
-    CONN_MAX_AGE = os.environ['CONN_MAX_AGE']
-    # TEMPLATE_LOADERS =
-
-    # Error reporting
