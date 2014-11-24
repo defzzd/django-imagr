@@ -693,4 +693,33 @@ def run_complete_setup():
     run_command_on_selected_server(_runserver, askforchoice=False)
 
 
+# At the time of this writing, the app is now deployable automatically
+# using 'fab run_complete_setup' from the fabfile.py directory.
+
+# One problem remains: The django-registration-redux package and its default
+# templates include references to a 'site' object, as in {{ site.domain }},
+# which was not mentioned anywhere else we've run into while developing
+# the project so far.
+# This causes it to create emails that redirect newly-registered users to
+# the proxy address gunicorn is using to talk to Nginx, which is currently
+# 127.0.0.1:8888, which will cause registration emails to direct
+# newly-registered users to a nonexistent site on their own machine.
+
+# The fabfile will still start the server on its own, but to make it
+# accessible to the outside world it is currently necessary to make
+# an admin with the following command, once again with credit to:
+# https://github.com/miracode/django-imagr/blob/master/fabfile.py
+
+
+def _create_superuser():
+    with cd('django-imagr/imagr_site'):
+        sudo('python manage.py migrate')
+        sudo('python manage.py createsuperuser')
+
+
+def create_superuser(askforchoice=False):
+    run_command_on_selected_server(_create_superuser, askforchoice=askforchoice)
+
+
+
 
