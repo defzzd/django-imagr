@@ -1,5 +1,5 @@
 from fabric.api import task, cd, run, env, prompt, execute, sudo
-from fabric.api import open_shell, settings, put
+from fabric.api import open_shell, settings, put, local
 import os
 import boto.ec2
 import time
@@ -19,8 +19,12 @@ import time
 # obnoxiously intrude on other uses of the fabfile.
 # For future readers, I apologize and accept all blame for this monstrosity.
 
+# So, that didn't work. Documented my failure in
+# This fabfile will assume credentials.py exists in both settings.py's
+# directory on the server and fabfile.py's directory on the local machine.
+import credentials
+credentials.set_credentials()
 
-# def create_aws_env():
 env.hosts = ['*',]
 env['user'] = 'ubuntu'
 # Getting a connection to us-west-2:
@@ -271,10 +275,10 @@ def run_command_on_localhost(command):
     execute(command, hosts=['localhost', ])
 
 def _copy_credentials_file_locally():
-    put("imagr_site/imagr_site/credentials.py",
-        "credentials.py", use_sudo=True)
+    # put("imagr_site/imagr_site/credentials.py",
+    #     "credentials.py", use_sudo=True)
+    local("cp ./imagr_site/imagr_site/credentials.py credentials.py")
 
-    # NOTE: If credentials.py is not
 
 
 
@@ -346,8 +350,16 @@ def _move_sources():
     # CMGTODO:
     # We don't want to git clone if we already have this directory
     #  set up on the machine.
-    run("git clone https://github.com/CharlesGust/django-imagr.git")
-    sudo("ln -s /home/ubuntu/django-imagr/nginx.conf /etc/nginx/sites-enabled/amazonaws.com")
+
+    # TEMPORARILY COMMENTED FOR TESTING
+    # I'm using my own fork to test a change and will discuss it with Charles
+    # after I've debugged it. This requires changing where the remote instance
+    # looks for a clone:
+    # run("git clone https://github.com/CharlesGust/django-imagr.git")
+    run("git clone https://github.com/BFriedland/django-imagr.git")
+
+    sudo("ln -s /home/ubuntu/django-imagr/nginx.conf" +
+         " /etc/nginx/sites-enabled/amazonaws.com")
 
     # The credentials.py file is needed in two places, now.
     # One for the fabfile's database creation and one for Django's settings.py:
@@ -398,7 +410,9 @@ def _move_sources():
         # I centralized it into the preexisting function, _install_pips
 
         put("imagr_site/imagr_site/credentials.py",
-            "/home/ubuntu/django-imagr/imagr_site/imagr_site/credentials.py", use_sudo=True)
+            "/home/ubuntu/django-imagr/imagr_site/imagr_site/credentials.py",
+            use_sudo=True)
+
 
 def move_sources():
     run_command_on_selected_server(_move_sources)
@@ -507,7 +521,15 @@ def _setup_database():
 
     # Insert the database password into the os.environ dictionary (without
     # make it visible on GitHub, from this file):
-    _set_credentials()
+
+    # Turns out this has to be called outside of the fabfile's functions'
+    # scope for some reason -- it can't import packages inside functions
+    # and I'm not entirely sure why. It might be trying to run the functions
+    # somewhere other than the fabfile's directory but on the same machine.
+    # More discussion and a record of my failed attempt is saved at the
+    # following function's comment:
+    # _set_credentials()
+
     # Take it out of the dictionary and use it for the SQL command string,
     # which is handed to the server instance after it's constructed:
     password = os.environ['DATABASE_PASSWORD']
@@ -519,32 +541,65 @@ def _setup_database():
     GRANT ALL ON DATABASE imagr TO imagr;"
     """ % password
 
-    sudo('psql -U postgres imagr -c %s' % create_user_sql_query, user='postgres')
+    sudo('psql -U postgres imagr -c %s' % create_user_sql_query,
+         user='postgres')
 
 
 def _set_credentials():
 
-    if credentials:
-        credentials.set_credentials()
+    # This isn't working and I don't know why and I ran out of time. <_<
 
-    else:
+    # import credentials does not work when running fabric from the CLI,
+    # even though the file is sitting right next to it, there's no naming
+    # problems, the file is identical to what I'd expect, I'm running
+    # the local() command from the fabric API, I'm working with try:except
+    # to catch all the errors leading to the end when it should work on
+    # the first try: section because the file is simply there and imported
+    # already...
+    # I think fabric is taking all of this code inside the _set_credentials()
+    # function here and executing it somewhere there is no ability to call
+    # import credentials within the function.
+    # I thought making the import statement inside the fabric function would
+    # reduce unnecessary imports, however this seems to have been an
+    # incorrect assumption on my part.
+    # I think the easiest way to make this work at this point is to
+    # take advantage of Python's scripting nature and put a fabric call
+    # to the bash cp command above the import credentials call, but keep
+    # the import outside of a fabric function; that way the copying will
+    # happen but the import won't be executed in some other context that
+    # I don't know about (presumably).
+    # This would all be interesting to research when I have more time.
 
-        try:
-            import credentials
+    # So the above explanation makes sense, I'm going to leave the commented
+    # code here as a record of my attempt to get this to work:
 
-        except:
-            # If credentials is not in the current directory, it's probably
-            # still sitting next to settings.py in the imagr_site/imagr_site/
-            # directory. It must then be transferred on the local machine:
-            run_command_on_localhost(_copy_credentials_file_locally)
+    # try:
+    #     credentials.set_credentials()
 
-            import credentials
+    # except:
+
+    #     try:
+    #         import credentials
+
+    #     except:
+    #         # If credentials is not in the current directory, it's probably
+    #         # still sitting next to settings.py in the imagr_site/imagr_site/
+    #         # directory. It must then be transferred on the local machine:
+    #         run_command_on_localhost(_copy_credentials_file_locally)
+    #         time.sleep(5)
+    #         import credentials
+    print "Deprecated function, debugging print here."
 
 
 def _alter_database_user_password():
 
-    _set_credentials()
-
+    # Turns out this has to be called outside of the fabfile's functions'
+    # scope for some reason -- it can't import packages inside functions
+    # and I'm not entirely sure why. It might be trying to run the functions
+    # somewhere other than the fabfile's directory but on the same machine.
+    # More discussion and a record of my failed attempt is saved at the
+    # following function's comment:
+    # _set_credentials()
 
     password = os.environ['DATABASE_PASSWORD']
 
@@ -552,34 +607,37 @@ def _alter_database_user_password():
     ALTER ROLE imagr password to '%s';"
     """ % password
 
-    sudo('psql -U postgres testimagr -c %s' % alter_password_sql_query, user='postgres')
+    sudo('psql -U postgres testimagr -c %s' % alter_password_sql_query,
+         user='postgres')
+
 
 def alter_database_user_password():
 
     run_command_on_selected_server(_alter_database_user_password)
 
 
-
 def _destroy_database():
 
     # For testing.
     # DOES NOT YET WORK, so...
-    raise Exception("_destroy_database not yet implemented. Try remaking the server instead.")
+    raise Exception("_destroy_database not yet implemented." +
+                    " Try remaking the server instead.")
 
     # destroy_database_sql_query = """"
     # DROP DATABASE imagr;
     # DROP USER imagr;"
     # """
 
-    # sudo('psql -U postgres postgres -c %s' % destroy_database_sql_query, user='postgres')
+    # sudo('psql -U postgres postgres -c %s' % destroy_database_sql_query,
+    #      user='postgres')
 
     # sudo('destroydb imagr', user='postgres')
     # sudo('destroyuser imagr', user='postgres')
 
 
-
 def destroy_database(askforchoice=True):
-    run_command_on_selected_server(_destroy_database, askforchoice=askforchoice)
+    run_command_on_selected_server(_destroy_database,
+                                   askforchoice=askforchoice)
 
 
 def setup_database(askforchoice=True):
@@ -610,7 +668,7 @@ def run_complete_setup():
     run_command_on_selected_server(_restart_server, askforchoice=False)
     # Restarting the server requires a little waiting time for it to finish
     # installing all of its updates.
-    time.sleep(60)
+    time.sleep(120)
 
     # Involves moving credentials.py:
     run_command_on_selected_server(_move_sources, askforchoice=False)
@@ -623,7 +681,8 @@ def run_complete_setup():
     # except as called by the Django settings.py file in _runserver().
     # In a sleepy haze I wasted an hour trying to perfect this for no
     # real reason, but I learned a bit about os.environ and execfile, so...
-    # run_command_on_selected_server(_invoke_credentials_on_server, askforchoice=False)
+    # run_command_on_selected_server(_invoke_credentials_on_server,
+    #                                askforchoice=False)
 
     # What we actually have to do is put the database password into localhost's
     # os.environ while the fabric script is running, so that it can read it

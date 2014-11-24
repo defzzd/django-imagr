@@ -33,7 +33,11 @@ DEBUG = os.environ['DEBUG']
 
 TEMPLATE_DEBUG = os.environ['TEMPLATE_DEBUG']
 
-ALLOWED_HOSTS = os.environ['ALLOWED_HOSTS']
+# There's only one host entry the Django app needs when it's running on
+# gunicorn behind an Nginx server, and that is '*', because Nginx is
+# doing all the filtering for us with our entry in the nginx.conf file.
+# Django still wants ALLOWED_HOSTS to be a list, so:
+ALLOWED_HOSTS = list(os.environ['ALLOWED_HOSTS'])
 
 # CSRF cookie settings defaults should be permissible for this demonstration,
 # because we don't need to handle a certificate yet.

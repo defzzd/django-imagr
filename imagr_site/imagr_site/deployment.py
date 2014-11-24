@@ -20,7 +20,9 @@ def setup_deployment():
     #   server_name *.amazonaws.com;
     # is what we thought we had to do here, but in fact it's not,
     # due to the whole proxy thing. So, here we're using '*' instead:
-    os.environ['ALLOWED_HOSTS'] = ['*']  # "['imagr_app.charlesgust.me',]"
+
+    # "putenv(key, item) ... TypeError: Must be string, not list"
+    os.environ['ALLOWED_HOSTS'] = '*'  # "['imagr_app.charlesgust.me',]"
 
     # There is a risk that the greater security of setting
     #  these to True will not work unless we get an SSL
