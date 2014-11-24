@@ -5,6 +5,21 @@ import boto.ec2
 import time
 
 
+# IMPORTANT: This fabfile requires a credentials.py file to be imported
+# from its current directory, since turning a repo for a Django app into
+# a package is something I've never done before, and on a deadline it
+# sounds too much like it could become a large time sink of new stuff
+# to learn before tomorrow, such as whether the __init__.py file will
+# mess up any of Django's other imports in non-obvious ways.
+# Therefore, this fabfile will assume the credentials.py file is located...
+#   (from the repo directory): django_site/django_site/credentials.py
+# And, if it cannot be imported here, a try:except block will handle it
+# and use Fabric to move the file into its own directory and import it.
+# This is all carried out inside _setup_database() so that it does not
+# obnoxiously intrude on other uses of the fabfile.
+# For future readers, I apologize and accept all blame for this monstrosity.
+
+
 # def create_aws_env():
 env.hosts = ['*',]
 env['user'] = 'ubuntu'
@@ -12,15 +27,28 @@ env['user'] = 'ubuntu'
 env['aws_region'] = 'us-west-2'
 
 # This inserts the credentials into the OS environment.
-execfile("./imagr_site/imagr_site/credentials.py")
-
-
-
+# Do not do this. Execfile() is bad and I should feel bad for trying it.
+# env['dbpwd'] = execfile("./imagr_site/imagr_site/credentials.py")
 
 
 def _install_pips():
-    sudo("pip install -r requirements.txt")
-    # pass
+    with cd("django-imagr"):
+
+        # Reference for the following:
+        # https://bugs.launchpad.net
+        #            /ubuntu/+source/python-pip/+bug/1306991/comments/24
+        # This had to happen because of some kind of error pip has in
+        # this version, possibly related to unbutu.
+        #sudo("apt-get remove python-pip")
+        sudo("wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py")
+        sudo("python get-pip.py")
+
+        sudo("pip install -r requirements.txt")
+
+
+def install_pips(askforchoice=False):
+    run_command_on_selected_server(_install_pips, askforchoice=askforchoice)
+
 
 # also, we need to sudo and bind on Ubuntu to get access to low number ports
 # sudo(".....b0000")
@@ -40,9 +68,8 @@ def _runserver():
 
 
 
-
-
-
+def runserver(askforchoice=False):
+    run_command_on_selected_server(_runserver, askforchoice=askforchoice)
 
 
 # "Our interactions with boto are all oriented around
@@ -237,9 +264,24 @@ def run_command_on_selected_server(command, askforchoice=True):
     execute(command, hosts=selected_hosts)
 
 
-def restart_server():
+# The following two functions were created to automatically copy
+# the credentials file into the fabfile's directory during run_complete_setup()
+def run_command_on_localhost(command):
+    # select_instance() not required because env.active_instance is not needed.
+    execute(command, hosts=['localhost', ])
+
+def _copy_credentials_file_locally():
+    put("imagr_site/imagr_site/credentials.py",
+        "credentials.py", use_sudo=True)
+
+    # NOTE: If credentials.py is not
+
+
+
+def _restart_server(wait_for_running=True):
     sudo("shutdown -r now")
-    #time.sleep(60)
+    # Wait for it in the main chaining function, don't block inside the function.
+    # time.sleep(60)
 
 # "Remember, you cannot use password authentication to log into AWS servers.
 # If you find that you are prompted to enter a password in order to run
@@ -270,7 +312,15 @@ def _setup_imagr_aptgets():
 
     # Attempting to fix "ImportError: cannot import name IncompleteRead"
     #sudo("pip install -U pip")
-    sudo("apt-get -y install python-pip")
+
+
+    # pip before dev or dev before pip?
+    # sudo("apt-get -y install python-pip")
+    # IMPORTANT NOTE: The above command gives a bad version of pip for ubuntu!
+    # Reference for the following:
+    # https://bugs.launchpad.net
+    #            /ubuntu/+source/python-pip/+bug/1306991/comments/24
+
 
     sudo("apt-get -y install python-dev")
     sudo("apt-get -y install postgresql-9.3")
@@ -282,7 +332,9 @@ def _setup_imagr_aptgets():
     # if any updates were performed above, we probably have to reboot server
 
     sudo("/etc/init.d/nginx start")
-    restart_server()
+    # This requires some waiting for the server restart to take effect.
+    # Moving it to the main chaining function to emphasize this.
+    # _restart_server()
 
 
 
@@ -297,10 +349,56 @@ def _move_sources():
     run("git clone https://github.com/CharlesGust/django-imagr.git")
     sudo("ln -s /home/ubuntu/django-imagr/nginx.conf /etc/nginx/sites-enabled/amazonaws.com")
 
+    # The credentials.py file is needed in two places, now.
+    # One for the fabfile's database creation and one for Django's settings.py:
+    # with cd("django-imagr"):
+    #     put("imagr_site/imagr_site/credentials.py",
+    #         "/home/ubuntu/django-imagr/credentials.py", use_sudo=True)
+
+    # Uh, I think that file needs to be copied on my computer for fabric. <_<
+    # That will have to happen on every deployment computer.
+    # The fabfile could automate that too, but I'll have to do it later.
+
     with cd("django-imagr"):
-        sudo("pip install -r requirements.txt")
+
+        # Reference for the following:
+        # https://bugs.launchpad.net
+        #            /ubuntu/+source/python-pip/+bug/1306991/comments/24
+        # So, this doesn't work on its own here at the time of writing:
+        # sudo("pip install -r requirements.txt")
+        # EITHER the following must happen BEFORE the above:
+        #   sudo apt-get remove python-pip
+        #   wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py
+        #   sudo python get-pip.py
+        # OR pip install -r requirements.txt doesn't need to be called at all,
+        # though I have no idea why not -- I did the above after getting the
+        # IncompleteRead error, and got a ton of
+        # "Requirement already satisfied" messages -- so I checked and
+        # YES it was there already even though it never did it without getting
+        # me an error. No idea what's going on there.
+        # ...
+        # It could be that IncompleteRead traceback pops up but
+        # pip installs the requirements anyways. That would mean we tell Fabric
+        # to ignore tracebacks, somehow.
+
+        # Reason I commented this:
+        #   To separate it into _install_pips
+        # sudo("apt-get remove python-pip")
+        # sudo("wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py")
+        # sudo("python get-pip.py")
+
+        # To be clear, all of this "pip install -r requirements.txt" business
+        # goes in in _install_pips.
+        # sudo("pip install -r requirements.txt")
+
+        # I may also figured out why all of that wasn't working before.
+        # It's because we were pip installing requirements.txt twice, probably.
+        # Or else it was the ubuntu error which required removing pip
+        # and installing it again. I don't know, but now it works, because
+        # I centralized it into the preexisting function, _install_pips
+
         put("imagr_site/imagr_site/credentials.py",
-           "/home/ubuntu/django-imagr/imagr_site/imagr_site/credentials.py", use_sudo=True)
+            "/home/ubuntu/django-imagr/imagr_site/imagr_site/credentials.py", use_sudo=True)
 
 def move_sources():
     run_command_on_selected_server(_move_sources)
@@ -382,6 +480,13 @@ def terminate_stopped_instance(askforchoice=True):
 
 
 
+def terminate_running_instance(askforchoice=True):
+
+    select_instance(state='running', askforchoice=askforchoice)
+
+    ec2_connection = get_ec2_connection()
+
+    ec2_connection.terminate_instances(instance_ids=[env.active_instance.id])
 
 
 def run_custom_command(command):
@@ -389,11 +494,22 @@ def run_custom_command(command):
     sudo(command)
 
 
+# "Stop. No. Why."
+# execfile("./imagr_site/imagr_site/credentials.py")
+# Give it more time than it needs to complete the above, just in case.
+# time.sleep(5)
+# print "os.environ['DATABASE_PASSWORD'] == {}".format(os.environ['DATABASE_PASSWORD'])
 
 
 # The following comes mostly from miracode again. Reference:
 # https://github.com/miracode/django-imagr/blob/master/fabfile.py
 def _setup_database():
+
+    # Insert the database password into the os.environ dictionary (without
+    # make it visible on GitHub, from this file):
+    _set_credentials()
+    # Take it out of the dictionary and use it for the SQL command string,
+    # which is handed to the server instance after it's constructed:
     password = os.environ['DATABASE_PASSWORD']
 
     sudo('createdb imagr', user='postgres')
@@ -405,76 +521,117 @@ def _setup_database():
 
     sudo('psql -U postgres imagr -c %s' % create_user_sql_query, user='postgres')
 
+
+def _set_credentials():
+
+    if credentials:
+        credentials.set_credentials()
+
+    else:
+
+        try:
+            import credentials
+
+        except:
+            # If credentials is not in the current directory, it's probably
+            # still sitting next to settings.py in the imagr_site/imagr_site/
+            # directory. It must then be transferred on the local machine:
+            run_command_on_localhost(_copy_credentials_file_locally)
+
+            import credentials
+
+
+def _alter_database_user_password():
+
+    _set_credentials()
+
+
+    password = os.environ['DATABASE_PASSWORD']
+
+    alter_password_sql_query = """"
+    ALTER ROLE imagr password to '%s';"
+    """ % password
+
+    sudo('psql -U postgres testimagr -c %s' % alter_password_sql_query, user='postgres')
+
+def alter_database_user_password():
+
+    run_command_on_selected_server(_alter_database_user_password)
+
+
+
+def _destroy_database():
+
+    # For testing.
+    # DOES NOT YET WORK, so...
+    raise Exception("_destroy_database not yet implemented. Try remaking the server instead.")
+
+    # destroy_database_sql_query = """"
+    # DROP DATABASE imagr;
+    # DROP USER imagr;"
+    # """
+
+    # sudo('psql -U postgres postgres -c %s' % destroy_database_sql_query, user='postgres')
+
+    # sudo('destroydb imagr', user='postgres')
+    # sudo('destroyuser imagr', user='postgres')
+
+
+
+def destroy_database(askforchoice=True):
+    run_command_on_selected_server(_destroy_database, askforchoice=askforchoice)
+
+
+def setup_database(askforchoice=True):
+    run_command_on_selected_server(_setup_database, askforchoice=askforchoice)
+
+
+def ssh():
+    run_command_on_selected_server(open_shell)
+
+
+# Not actually needed, it turns out. Credentials must be invoked LOCALLY
+# # in the fabfile for setting up the database, not on the remote server.
+# def _invoke_credentials_on_server():
+#     with cd('django-imagr/imagr_site/imagr_site'):
+#         sudo('python credentials.py')
+#     # time.sleep(2)
+
+# def invoke_credentials_on_server():
+#     run_command_on_selected_server(_invoke_credentials_on_server)
+
+
 # These need run_command_on_selected_server() to run on them, so set
 # askforchoice=False
 def run_complete_setup():
     provision_instance(wait_for_running=True)
     run_command_on_selected_server(_setup_imagr_aptgets, askforchoice=False)
+
+    run_command_on_selected_server(_restart_server, askforchoice=False)
+    # Restarting the server requires a little waiting time for it to finish
+    # installing all of its updates.
+    time.sleep(60)
+
+    # Involves moving credentials.py:
     run_command_on_selected_server(_move_sources, askforchoice=False)
+
+    # Involves installing from requirements.txt:
     run_command_on_selected_server(_install_pips, askforchoice=False)
+
+    # Credentials must be loaded on the LOCAL machine before creating
+    # the database. They're not needed when running through the fabfile,
+    # except as called by the Django settings.py file in _runserver().
+    # In a sleepy haze I wasted an hour trying to perfect this for no
+    # real reason, but I learned a bit about os.environ and execfile, so...
+    # run_command_on_selected_server(_invoke_credentials_on_server, askforchoice=False)
+
+    # What we actually have to do is put the database password into localhost's
+    # os.environ while the fabric script is running, so that it can read it
+    # and use data in it to construct the database with a .gitignored password.
+    # That function happens inside _setup_database, because that's the only
+    # fabric command that needs the database password.
     run_command_on_selected_server(_setup_database, askforchoice=False)
     run_command_on_selected_server(_runserver, askforchoice=False)
-
-
-
-
-
-
-
-
-# setup_incomplete_server and finish_incomplete_server, along with the
-# split function *incomplete_imagr_aptgets, exist because running
-# apt-get
-
-def setup_incomplete_server():
-    provision_instance(wait_for_running=True)
-    run_command_on_selected_server(_setup_incomplete_imagr_aptgets, askforchoice=False)
-
-def finish_incomplete_server_setup():
-    run_command_on_selected_server(_finish_incomplete_imagr_aptgets)
-    run_command_on_selected_server(_move_sources)
-    run_command_on_selected_server(_install_pips)
-
-
-# provision_instance
-#    get_ec2_connection
-# _setup_imagr_aptgets
-# _move_sources
-# _install_pips
-# _setup_database
-# runserver()
-
-
-def _setup_incomplete_imagr_aptgets():
-    # For some reason, there must be a pause before apt-getting anything,
-    # or else even a status=='running' server will time out the request.
-
-
-    # check for any system updates
-    time.sleep(60)
-    sudo("apt-get -y update")
-    #time.sleep(60)
-    # check for any system upgrades
-    sudo("apt-get -y upgrade")
-
-def _finish_incomplete_imagr_aptgets():
-
-    # Attempting to fix "ImportError: cannot import name IncompleteRead"
-    #sudo("pip install -U pip")
-    sudo("apt-get -y install python-pip")
-
-    sudo("apt-get -y install python-dev")
-    sudo("apt-get -y install postgresql-9.3")
-    sudo("apt-get -y install postgresql-server-dev-9.3")
-    sudo("apt-get -y install git")
-    sudo("apt-get -y install gunicorn")
-    sudo("apt-get -y install nginx")
-
-    # if any updates were performed above, we probably have to reboot server
-
-    sudo("/etc/init.d/nginx start")
-    restart_server()
-
 
 
 

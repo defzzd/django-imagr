@@ -25,12 +25,25 @@ EMAIL_PORT = 25
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ['SECRET_KEY']
 
+
+import deployment
+deployment.setup_deployment()
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ['DEBUG']
 
-TEMPLATE_DEBUG = True
+TEMPLATE_DEBUG = os.environ['TEMPLATE_DEBUG']
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ['ALLOWED_HOSTS']
+
+# CSRF cookie settings defaults should be permissible for this demonstration,
+# because we don't need to handle a certificate yet.
+# In reality we'd want to use a certificate and set them to True
+# via the deployment file.
+# CSRF_COOKIE_SECURE = os.environ['CSRF_COOKIE_SECURE']
+# SESSION_COOKIE_SECURE = os.environ['SESSION_COOKIE_SECURE']
+
+CONN_MAX_AGE = os.environ['CONN_MAX_AGE']
+
 
 
 # Application definition
@@ -117,7 +130,7 @@ STATIC_ROOT = "static/"
 
 MEDIA_ROOT = "media/"
 
-DEBUG = False
+#DEBUG = False
 
 ALLOWED_HOSTS = ['*',]
 
@@ -132,4 +145,3 @@ ALLOWED_HOSTS = ['*',]
 
     # Performance Optimizations
 
-CONN_MAX_AGE = 60
